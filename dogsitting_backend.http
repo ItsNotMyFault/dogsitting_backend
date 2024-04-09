@@ -1,0 +1,11 @@
+@dogsitting_backend_HostAddress = http://localhost:5188
+
+GET {{dogsitting_backend_HostAddress}}/home/
+Accept: application/json
+
+###
+
+GET {{dogsitting_backend_HostAddress}}/event
+Accept: application/json
+
+###

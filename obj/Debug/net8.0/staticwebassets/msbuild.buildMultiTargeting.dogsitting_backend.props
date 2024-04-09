@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\dogsitting_backend.props" />
+</Project>
