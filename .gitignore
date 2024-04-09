@@ -2,6 +2,7 @@
 ## Dependency directories
 bin/
 obj/
+obj\
 packages/
 
 ## User-specific files
