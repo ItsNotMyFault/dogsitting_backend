@@ -97,3 +97,4 @@ F:\DevelopmentProjects\dogsitting_backend\bin\Debug\net8.0\runtimes\win\lib\netc
 F:\DevelopmentProjects\dogsitting_backend\bin\Debug\net8.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 F:\DevelopmentProjects\dogsitting_backend\bin\Debug\net8.0\MySqlConnector.dll
 F:\DevelopmentProjects\dogsitting_backend\bin\Debug\net8.0\Pomelo.EntityFrameworkCore.MySql.dll
+F:\DevelopmentProjects\dogsitting_backend\obj\Debug\net8.0\dogsitting_backend.sourcelink.json

@@ -9,7 +9,7 @@ namespace dogsitting_backend.Domain
         public string Name { get; set; }
 
         public ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
-        //public virtual Calendar Calendar { get; set; }
+        //public Calendar Calendar { get; set; }
 
 
         public Team()
