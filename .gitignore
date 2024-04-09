@@ -1,0 +1,66 @@
+# .NET 8.0
+## Dependency directories
+bin/
+obj/
+packages/
+
+## User-specific files
+*.suo
+*.user
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio files
+*.vscode/
+.vs/
+.vscode/
+
+## Rider files
+.idea/
+
+## ReSharper files
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## NuGet
+*.nuget/
+*.nupkg
+*.paket/paket.exe
+packages/
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/

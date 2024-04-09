@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("dogsitting_backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7769ca27a5bcd1d1888b8e8c90885477f27af92a")]
 [assembly: System.Reflection.AssemblyProductAttribute("dogsitting_backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("dogsitting_backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
