@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.domain;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace dogsitting_backend.Domain
@@ -9,7 +10,10 @@ namespace dogsitting_backend.Domain
         public string Name { get; set; }
 
         public ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
-        //public Calendar Calendar { get; set; }
+        [NotMapped]
+        public Calendar Calendar { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public List<Reservation> Reservations{ get; set; }
 
 
         public Team()

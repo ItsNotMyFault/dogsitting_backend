@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.domain;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dogsitting_backend.Domain
 {
@@ -8,9 +9,13 @@ namespace dogsitting_backend.Domain
         [Key]
         public Guid Id { get; set; }
 
-        private DateTimePeriod Period { get; set; }
-        public virtual ApplicationUser Client { get; set; }
-        public virtual Team Team { get; set; }
+        [NotMapped]
+        public DateTimePeriod Period { get; set; }
+        [NotMapped]
+        public ApplicationUser Client { get; set; }
+        public Guid Team_Id { get; set; }
+ 
+        public Team Team { get; set; }
         private int LodgerCount = 1;
 
         public Reservation() { }

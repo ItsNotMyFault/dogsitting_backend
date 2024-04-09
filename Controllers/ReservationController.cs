@@ -13,15 +13,23 @@ namespace dogsitting_backend.Controllers
     [Route("[controller]")]
     public class ReservationController : ControllerBase
     {
-        public ReservationController()
+        private ReservationService ReservationService;
+        public ReservationController(ReservationService reservationService)
         {
+            this.ReservationService = reservationService;
         }
 
 
-        [HttpGet(Name = "GetReservations")]
+        [HttpGet(Name = "GetReservation")]
         public ActionResult Get()
         {
-            return Ok(0);
+            List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            string json = JsonConvert.SerializeObject(reservations, settings);
+            return Ok(json);
         }
 
 

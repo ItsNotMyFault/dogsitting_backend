@@ -1,0 +1,31 @@
+﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.Domain;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+namespace dogsitting_backend.Infrastructure
+{
+    public class ReservationSQLRepository
+    {
+        public DogsittingDBContext context { get; set; }
+
+        public ReservationSQLRepository(DogsittingDBContext context)
+        {
+            this.context = context;
+        }
+
+        public async Task<List<Reservation>> GetAllReservationsAsync()
+        {
+            return await this.context.Reservations.Include("Team").ToListAsync();
+        }
+
+
+        public async Task<Object> Create(Reservation reservation)
+        {
+            this.context.Reservations.Add(reservation);
+            await this.context.SaveChangesAsync();
+            return reservation;
+        }
+
+    }
+}

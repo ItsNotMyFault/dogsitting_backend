@@ -13,12 +13,10 @@ namespace dogsitting_backend.Controllers
     [Route("[controller]")]
     public class TeamController : ControllerBase
     {
-        private DogsittingDBContext context;
         private TeamService teamService;
-        public TeamController(IConfiguration configuration, DogsittingDBContext context, TeamService teamService)
+        public TeamController(TeamService teamService)
         {
             this.teamService = teamService;
-            this.context = context;
         }
 
 

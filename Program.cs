@@ -22,7 +22,9 @@ var isdev = Environment.IsDevelopment();
 
 builder.Services.AddSingleton<IConfiguration>(Configuration);
 builder.Services.AddTransient<TeamService>();
+builder.Services.AddTransient<ReservationService>();
 builder.Services.AddTransient<TeamSQLRepository>();
+builder.Services.AddTransient<ReservationSQLRepository>();
 builder.Services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
 builder.Services.AddDbContext<DogsittingDBContext>(options =>

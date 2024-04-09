@@ -13,13 +13,16 @@ namespace dogsitting_backend.Infrastructure
 
         public DbSet<Team> Teams { get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<ApplicationRole> Roles{ get; set; }
+        public DbSet<Reservation> Reservations{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //modelBuilder.Entity<Team>().ToTable("Teams");
             modelBuilder.Entity<ApplicationUser>().ToTable("Users");
             modelBuilder.Entity<ApplicationRole>().ToTable("Roles");
-            //modelBuilder.Entity<Reservation>().ToTable("Reservations").HasOne(e => e.Team);
+            modelBuilder.Entity<Reservation>().ToTable("Reservations").HasOne(e => e.Team).WithMany(t => t.Reservations).HasForeignKey(r => r.Team_Id);
+
             //modelBuilder.Entity<Reservation>().ToTable("Reservations").HasOne(e => e.Client);
             // modelBuilder.Entity<Team>()
             //.HasOne(t => t.Admin)
