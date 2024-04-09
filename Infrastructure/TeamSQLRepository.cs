@@ -2,6 +2,9 @@
 using dogsitting_backend.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace dogsitting_backend.Infrastructure
 {
