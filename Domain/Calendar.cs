@@ -1,4 +1,7 @@
-﻿namespace dogsitting_backend.Domain
+﻿using System;
+using System.Collections.Generic;
+
+namespace dogsitting_backend.Domain
 {
     public class Calendar
     {

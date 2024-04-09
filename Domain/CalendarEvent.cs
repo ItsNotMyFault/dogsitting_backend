@@ -1,4 +1,6 @@
-﻿namespace dogsitting_backend.Domain
+﻿using System;
+
+namespace dogsitting_backend.Domain
 {
     public class CalendarEvent
     {

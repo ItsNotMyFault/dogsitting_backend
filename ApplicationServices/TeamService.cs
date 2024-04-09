@@ -1,6 +1,9 @@
 ﻿using dogsitting_backend.Domain;
 using dogsitting_backend.Infrastructure;
 using MySql.Data.MySqlClient;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace dogsitting_backend.ApplicationServices
 {

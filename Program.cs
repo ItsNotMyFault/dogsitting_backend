@@ -1,9 +1,14 @@
 using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Infrastructure;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
