@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities.IO;
+using System.Collections.Generic;
 
 namespace dogsitting_backend.Controllers
 {
