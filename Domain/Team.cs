@@ -11,11 +11,7 @@ namespace dogsitting_backend.Domain
         public string Name { get; set; }
 
         public ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
-        [NotMapped]
         public Calendar Calendar { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
-        public List<Reservation> Reservations{ get; set; }
-
 
         public Team()
         {

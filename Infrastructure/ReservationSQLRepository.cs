@@ -22,6 +22,16 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Reservations.Include("Team").ToListAsync();
         }
 
+        public async Task<List<Reservation>> GetReservationsByCalendarIdAsync(Guid calendarId)
+        {
+            return await this.context.Reservations.Where(e => e.CalendarId == calendarId).ToListAsync();
+        }
+
+        public async Task<List<Reservation>> GetReservationsByUserIdAsync(Guid userId)
+        {
+            return await this.context.Reservations.Where(e => e.Client.Id == userId).ToListAsync();
+        }
+
 
         public async Task<Object> Create(Reservation reservation)
         {

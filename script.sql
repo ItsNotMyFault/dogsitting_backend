@@ -5,8 +5,10 @@ DROP TABLE roles;
 DROP TABLE userroles;
 DROP TABLE teamusers;
 DROP TABLE reservations;
+DROP TABLE Calendars;
 DROP TABLE teams;
 DROP TABLE USERS;
+
 
 CREATE TABLE Roles (
     id varchar(255) PRIMARY KEY,
@@ -26,12 +28,20 @@ CREATE TABLE Users (
     city varchar(255),
     phone varchar(255)
 );
-
+insert into Users (id, firstname, lastname, address, city, phone) values ("8825c601-f5c0-11ee-a26a-00155dd4f30d", "firstname", "lastname", "address", "quebec", "555-555-5555");
+insert into Users (id, firstname, lastname, email, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "alexis", "guay", "alexis_raphael_guay@hotmail.com", "address", "quebec", "555-555-5555");
+insert into Users (id, firstname, lastname, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f39d", "clientA", "clientA", "address", "quebec", "555-555-5555");
 CREATE TABLE UserRoles (
     id varchar(255) PRIMARY KEY,
-    user_id varchar(255),
-    role_id varchar(255)
+    userId varchar(255),
+    roleId varchar(255)
 );
+
+select * from users inner join TeamUsers on TeamUsers.userId = users.id where users.id = 'e0b2801d-f67c-11ee-a26a-00155dd4f30d';
+#give possibility to switch team from user interface, being in multiple teams.
+
+
+
 
 CREATE TABLE Teams (
     id varchar(255) PRIMARY KEY,
@@ -40,43 +50,55 @@ CREATE TABLE Teams (
 
 CREATE TABLE TeamUsers (
     id varchar(255) PRIMARY KEY,
-    user_id varchar(255),
-    team_id varchar(255),
-	CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_team_id FOREIGN KEY (team_id) REFERENCES teams(id)
+    userId varchar(255),
+    teamId varchar(255),
+	CONSTRAINT fk_TeamUsers_userId FOREIGN KEY (userId) REFERENCES users(id),
+    CONSTRAINT fk_TeamUsers_teamId FOREIGN KEY (teamId) REFERENCES teams(id)
 );
+insert into Teams(id, name) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "Annie & Annick");
+insert into Teams(id, name) values ("2efa6903-f682-11ee-a26a-00155dd4f30d", "Alexis");
+insert into Teams(id, name) values ("2f68968c-f682-11ee-a26a-00155dd4f30d", "Annie L.");
+insert into teamusers (id, userId, teamId) values (UUID(), "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
 
-
-#ALTER TABLE users ADD CONSTRAINT fk_grade_id FOREIGN KEY (grade_id) REFERENCES grades(id);
 
 CREATE TABLE Calendars (
-    id varchar(255) PRIMARY KEY
+    id varchar(255) PRIMARY KEY,
+    teamId varchar(255),
+    MaxWeekDaysLodgerCount int4,
+    MaxWeekendDaysLodgerCount int4,
+    UseAvailabilities boolean,
+    UseUnAvailabilities boolean,
+       CONSTRAINT fk_calendar_teamId FOREIGN KEY (teamId) REFERENCES teams(id)
 );
 
+insert into calendars (id, teamId, MaxWeekDaysLodgerCount, MaxWeekendDaysLodgerCount) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d", 1, 1);
+select * from calendars;
+
+select * from reservations;
+
+#ALTER TABLE users ADD CONSTRAINT fk_grade_id FOREIGN KEY (grade_id) REFERENCES grades(id);
 CREATE TABLE Reservations (
     id varchar(255) PRIMARY KEY,
     dateFrom datetime,
     dateTo datetime,
     lodgerCount integer,
-    user_id varchar(255),
-    team_id varchar(255),
-    CONSTRAINT fk_calendar_user_id FOREIGN KEY (user_id) REFERENCES users(id),
-    CONSTRAINT fk_calendar_team_id FOREIGN KEY (team_id) REFERENCES teams(id)
+    userId varchar(255),
+    calendarId varchar(255),
+    CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
+    CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
 );
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-01-01", "2024-12-01", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+select * from calendars inner join reservations on reservations.calendarId = calendars.id where teamId = "2e731e68-f682-11ee-a26a-00155dd4f30d";
 
 
-insert into Users (id, firstname, lastname, address, city, phone) values ("8825c601-f5c0-11ee-a26a-00155dd4f30d", "firstname", "lastname", "address", "quebec", "555-555-5555");
-insert into Users (id, firstname, lastname, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "alexis", "guay", "address", "quebec", "555-555-5555");
-insert into Users (id, firstname, lastname, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f39d", "clientA", "clientA", "address", "quebec", "555-555-5555");
 #UUID()
-insert into Teams(id, name) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "Annie & Annick");
-insert into Teams(id, name) values ("2efa6903-f682-11ee-a26a-00155dd4f30d", "Alexis");
-insert into Teams(id, name) values ("2f68968c-f682-11ee-a26a-00155dd4f30d", "Annie L.");
-insert into teamusers (id, user_id, team_id) values (UUID(), "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
-insert into reservations (id, dateFrom, dateTo, lodgerCount, user_id, team_id) values (UUID(), "2024-01-01", "2024-12-01", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+
+
 
 select * from users;
 select * from teams;
 select * from teamusers;
 select * from reservations;
+select * from calendars;
+select * from reservations where teamId = "2e731e68-f682-11ee-a26a-00155dd4f30d";
 

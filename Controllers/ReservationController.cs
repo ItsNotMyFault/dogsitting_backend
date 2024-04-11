@@ -24,14 +24,16 @@ namespace dogsitting_backend.Controllers
 
 
         [HttpGet(Name = "GetReservation")]
-        public ActionResult Get()
+        public async Task<ActionResult> Get()
         {
-            List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
+            var test = await this.ReservationService.GetReservations();
+            //List<Reservation> reservations = this.ReservationService.GetReservationsByUserId(null).Result.ToList();
+            //List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
-            string json = JsonConvert.SerializeObject(reservations, settings);
+            string json = JsonConvert.SerializeObject(test.ToList(), settings);
             return Ok(json);
         }
 

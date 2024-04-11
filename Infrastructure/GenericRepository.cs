@@ -14,6 +14,12 @@ namespace dogsitting_backend.Infrastructure
         public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbContext.Set<T>().ToListAsync();
+            //return await _dbContext.Set<T>().ToListAsync();
+        }
+
+        public IEnumerable<T> GetAll()
+        {
+            return _dbContext.Set<T>().ToList();
         }
 
         public async Task<T> GetByIdAsync(int id)

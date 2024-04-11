@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dogsitting_backend.Domain
 {
     public class Calendar
     {
         public Guid Id { get; set; }
+        [NotMapped]
         public List<DateTimePeriod> UnavailablePeriods { get; set; }
-        public virtual List<Reservation> Reservations { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public List<Reservation> Reservations { get; set; }
+        public Guid TeamId { get; set; }
+        public Team Team { get; set; }
 
         public int MaxWeekDaysLodgerCount = 1;
         public int MaxWeekendDaysLodgerCount = 3;

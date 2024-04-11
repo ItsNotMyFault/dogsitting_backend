@@ -18,28 +18,27 @@ namespace dogsitting_backend.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Team>().ToTable("Teams");
-            modelBuilder.Entity<ApplicationUser>().ToTable("Users");
-            modelBuilder.Entity<ApplicationRole>().ToTable("Roles");
-            modelBuilder.Entity<Reservation>().ToTable("Reservations").HasOne(e => e.Team).WithMany(t => t.Reservations).HasForeignKey(r => r.Team_Id);
+                  modelBuilder.Entity<Reservation>()
+            .HasOne(r => r.Calendar) // One-to-one relationship with Calendar
+            .WithMany(c => c.Reservations)
+            .HasForeignKey(r => r.CalendarId)
+            .IsRequired();
 
-            //modelBuilder.Entity<Reservation>().ToTable("Reservations").HasOne(e => e.Client);
-            // modelBuilder.Entity<Team>()
-            //.HasOne(t => t.Admin)
-            //.WithMany()
-            //.HasForeignKey(t => t.User_Id)
-            //.IsRequired();
-            //modelBuilder.Entity<Team>().HasOne(t => t.Calendar);
+            modelBuilder.Entity<Calendar>().ToTable("Calendars")
+            .HasMany(t => t.Reservations) // Calendar has many Reservations
+            .WithOne(r => r.Calendar);
+
+
             modelBuilder.Entity<Team>()
                 .HasMany(t => t.Admins)
                 .WithMany(t => t.Teams)
             .UsingEntity("TeamUsers",
-                right => right.HasOne(typeof(ApplicationUser)).WithMany().HasForeignKey("user_id").HasPrincipalKey(nameof(ApplicationUser.Id)),
-                left => left.HasOne(typeof(Team)).WithMany().HasForeignKey("team_id").HasPrincipalKey(nameof(Team.Id)),
+                right => right.HasOne(typeof(ApplicationUser)).WithMany().HasForeignKey("userId").HasPrincipalKey(nameof(ApplicationUser.Id)),
+                left => left.HasOne(typeof(Team)).WithMany().HasForeignKey("teamId").HasPrincipalKey(nameof(Team.Id)),
                 join =>
                 {
                     join.ToTable("TeamUsers"); // Specify the name of the join table
-                    join.HasKey("user_id", "team_id"); // Specify the composite primary key
+                    join.HasKey("userId", "teamId"); // Specify the composite primary key
                 }
             ); 
 
