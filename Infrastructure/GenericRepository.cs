@@ -22,6 +22,11 @@ namespace dogsitting_backend.Infrastructure
             return _dbContext.Set<T>().ToList();
         }
 
+        public DbSet<T> Build()
+        {
+            return _dbContext.Set<T>();
+        }
+
         public async Task<T> GetByIdAsync(int id)
         {
             return await _dbContext.Set<T>().FindAsync(id);

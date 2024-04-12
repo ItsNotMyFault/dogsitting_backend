@@ -10,7 +10,11 @@ namespace dogsitting_backend.Domain
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int WeekNumber;
-
+        public DateTimePeriod(DateTime date)
+        {
+            this.StartDate = date;
+            this.EndDate = date;
+        }
         public DateTimePeriod(DateTime StartDate, DateTime EndDate)
         {
             this.StartDate = StartDate;
@@ -33,6 +37,18 @@ namespace dogsitting_backend.Domain
         public string EndDateToString()
         {
             return this.EndDate.ToString("yyyy-MM-dd");
+        }
+
+        /// <summary>
+        /// Should really only be used for single day purposes...
+        /// startDate and endDate being the same value.
+        /// </summary>
+        public bool IsWeekend()
+        {
+            return this.StartDate.IsDayOfWeek(DayOfWeek.Saturday) ||
+                this.StartDate.IsDayOfWeek(DayOfWeek.Sunday) ||
+                this.EndDate.IsDayOfWeek(DayOfWeek.Saturday) ||
+                this.EndDate.IsDayOfWeek(DayOfWeek.Saturday);
         }
 
         public IEnumerable<DateTimePeriod> GetPeriodsOf15Minutes()

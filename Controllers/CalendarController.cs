@@ -14,20 +14,25 @@ namespace dogsitting_backend.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ReservationController : ControllerBase
+    public class CalendarController : ControllerBase
     {
         private ReservationService ReservationService;
-        public ReservationController(ReservationService reservationService)
+        public CalendarController(ReservationService reservationService)
         {
             this.ReservationService = reservationService;
         }
 
 
-        [HttpGet(Name = "GetReservation")]
+        [HttpGet(Name = "GetCalendar")]
         public async Task<ActionResult> Get()
         {
-            Calendar test = await this.ReservationService.GetReservations(null);
-            test.GetBusyEvents();
+            //param => mode client, mode admin (default selon le login)
+
+            //param mode busy-available /  mode departure events / mode list reservations (default).
+
+            var test = await this.ReservationService.GetReservations(null);
+            //List<Reservation> reservations = this.ReservationService.GetReservationsByUserId(null).Result.ToList();
+            //List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -36,12 +41,5 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
-
-
-        [HttpPost(Name = "PostReservation")]
-        public async Task<ActionResult> Post(Reservation reservation)
-        {
-            return Ok();
-        }
     }
 }

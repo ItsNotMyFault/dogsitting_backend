@@ -64,14 +64,15 @@ insert into teamusers (id, userId, teamId) values (UUID(), "e0b2801d-f67c-11ee-a
 CREATE TABLE Calendars (
     id varchar(255) PRIMARY KEY,
     teamId varchar(255),
-    MaxWeekDaysLodgerCount int4,
-    MaxWeekendDaysLodgerCount int4,
-    UseAvailabilities boolean,
-    UseUnAvailabilities boolean,
+    MaxWeekDaysLodgerCount int4 not null default(1),
+    MaxWeekendDaysLodgerCount int4 not null default(1),
+    UseAvailabilities boolean not null default(false),
+    UseUnAvailabilities boolean not null default(false),
        CONSTRAINT fk_calendar_teamId FOREIGN KEY (teamId) REFERENCES teams(id)
 );
 
-insert into calendars (id, teamId, MaxWeekDaysLodgerCount, MaxWeekendDaysLodgerCount) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d", 1, 1);
+insert into calendars (id, teamId, MaxWeekDaysLodgerCount, MaxWeekendDaysLodgerCount, UseAvailabilities, UseUnAvailabilities) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d", 1, 1, false, false);
+
 select * from calendars;
 
 select * from reservations;
@@ -88,6 +89,8 @@ CREATE TABLE Reservations (
     CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
 );
 insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-01-01", "2024-12-01", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-01", "2024-04-25", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-05-01", "2024-05-12", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
 select * from calendars inner join reservations on reservations.calendarId = calendars.id where teamId = "2e731e68-f682-11ee-a26a-00155dd4f30d";
 
 

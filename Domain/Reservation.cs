@@ -33,6 +33,7 @@ namespace dogsitting_backend.Domain
         public Guid CalendarId { get; set; }
 
         public int LodgerCount { get; set; } = 1;
+        public string ReservationTitle{ get => $"{this.Client.Name} ({this.LodgerCount})"; }
 
         public Reservation() { }
 
@@ -52,12 +53,14 @@ namespace dogsitting_backend.Domain
             //get busy status for client mode.
 
             //
-
-            foreach (DateTime datetime in Period.EachDay())
+            var dailyEvents = this.Calendar.GetDailyCalendarEvents();
+            List<CalendarEvent> events = [];
+            foreach (DateTime datetime in this.Period.EachDay())
             {
-                
+                dailyEvents.Where(eve => eve.DateTimePeriod.StartDate.Equals(datetime)).ToList();
+                events.Add(new CalendarEvent(datetime));
             };
-            return [];
+            return events;
         }
     }
 }

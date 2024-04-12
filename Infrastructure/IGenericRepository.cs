@@ -10,6 +10,7 @@ namespace dogsitting_backend.Infrastructure
 
         Task<IEnumerable<T>> GetAllAsync();
         IEnumerable<T> GetAll();
+        DbSet<T> Build();
         Task<T> GetByIdAsync(int id);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);

@@ -22,11 +22,15 @@ public class ApplicationUser :DBModel
     public string FirstName { get; set; }
     public string LastName { get; set; }
 
+    public string Email { get; set; }
+    public string Name { get => this.FirstName + " " + this.LastName; }
+
     [Newtonsoft.Json.JsonIgnore]
     public ICollection<Team> Teams { get; } = [];
     //public string Email { get; set; }
     //public int Enable { get; set; }
 
+    public IList<Reservation> Reservations{ get; set; }
     public IList<ApplicationRole> Roles { get; set; }
 
     public bool HasRole(string roleName)

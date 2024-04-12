@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.Domain;
 using dogsitting_backend.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,19 +21,38 @@ namespace dogsitting_backend.ApplicationServices
             this.ReservationSQLRepository = reservationSQLRepository;
         }
 
-        public async Task<IEnumerable<Reservation>> GetReservations()
+        public async Task<Calendar> GetReservations(string param)
         {
 
             //check current logged in User.
             //get his team => get his calendar
+            //var calendars = this._calendarGenereicRepository.GetAll();
+
+            //works
+            //var calendars = this._calendarGenereicRepository.Build().Include("Team").ToList();
+            var calendars = this._calendarGenereicRepository.Build().Include("Reservations").ToList();
+            Calendar testCalendar = calendars.First();
 
 
-            var calendars = this._calendarGenereicRepository.GetAll();
-            var testCalendar = calendars.First();
-            List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByCalendarIdAsync(testCalendar.Id);
-            return reservations;
+
+            //TODO breaks HERE
+            //List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByCalendarIdAsync(testCalendar.Id);
+
+            //List<CalendarEvent> events = [];
+            //reservations.ForEach(reservation =>
+            //{
+            //    events.AddRange(reservation.GetEvents());
+            //});
+
+
+            return testCalendar;
 
         }
+
+        //OPTIONS
+
+        //itérer sur tous les journées CalendarEvent et faire le +X selon le lodgerCount.
+        //ça implique de supprimer les événements en double.
 
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserId(string userId)
@@ -51,8 +71,6 @@ namespace dogsitting_backend.ApplicationServices
             //Validate calendar is available on desired period.
             //  IF NOT propose another team WHO IS. => check other teams.
 
-            //Validate calendar is available on desired period.
-            //  IF NOT propose another team WHO IS. => check other teams.
 
         }
 

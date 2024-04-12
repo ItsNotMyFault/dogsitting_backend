@@ -24,9 +24,10 @@ namespace dogsitting_backend.Infrastructure
             .HasForeignKey(r => r.CalendarId)
             .IsRequired();
 
-            modelBuilder.Entity<Calendar>().ToTable("Calendars")
-            .HasMany(t => t.Reservations) // Calendar has many Reservations
-            .WithOne(r => r.Calendar);
+            modelBuilder.Entity<Calendar>().ToTable("Calendars").HasOne(x => x.Team).WithOne(x => x.Calendar);
+            modelBuilder.Entity<Calendar>().ToTable("Calendars").HasMany(t => t.Reservations).WithOne(r => r.Calendar);
+            modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.Reservations).WithOne(r => r.Client);
+            //TODO: Fix la relation Reservation => client et la relation Calendrier => team
 
 
             modelBuilder.Entity<Team>()
@@ -46,3 +47,4 @@ namespace dogsitting_backend.Infrastructure
         }
     }
 }
+

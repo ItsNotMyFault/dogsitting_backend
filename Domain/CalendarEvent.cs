@@ -10,10 +10,18 @@ namespace dogsitting_backend.Domain
         public string EventSubject { get; set; }
         public string EventLocation { get; set; }
         public bool IsAllDayEvent { get; set; }
-        public CalendarEvent()
+        public CalendarEvent(string eventSubject)
         {
             this.Id = Guid.NewGuid();
         }
+
+        public CalendarEvent(DateTime dateTime)
+        {
+            this.DateTimePeriod = new DateTimePeriod(dateTime);
+            this.Id = Guid.NewGuid();
+            SetIsPeriodAllDay();
+        }
+
         public CalendarEvent(DateTimePeriod DateTimePeriod, FreeBusyStatus EventStatus)
         {
             this.Id = Guid.NewGuid();
