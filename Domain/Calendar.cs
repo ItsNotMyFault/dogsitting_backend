@@ -17,16 +17,19 @@ namespace dogsitting_backend.Domain
         [NotMapped]
         public List<DateTimePeriod> AvailablePeriods { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
-        public List<Reservation> Reservations { get; set; }
+        //[Newtonsoft.Json.JsonIgnore]
+        public virtual ICollection<Reservation> Reservations { get; set; }
+
+        [ForeignKey("Team")]
         public Guid TeamId { get; set; }
-        public Team Team { get; set; }
+        public virtual Team Team { get; set; }
 
         public bool UseAvailabilities { get; set; }
         public bool UseUnavailabilities { get; set; }
 
         public int MaxWeekDaysLodgerCount = 1;
         public int MaxWeekendDaysLodgerCount = 3;
+
         private DateTimePeriod GeneralPeriod = new(DateTime.Now.AddMonths(-3), DateTime.Now.AddMonths(12));
 
         public Calendar()
@@ -67,21 +70,22 @@ namespace dogsitting_backend.Domain
 
         }
 
-        private List<CalendarEvent> BusyEvents = new List<CalendarEvent>();
-        private List<DateTime> GetBusyDates()
-        {
-            return this.BusyEvents.Select(ev => ev.DateTimePeriod.StartDate).ToList();
-        }
+        public List<BusyCalendarEvent> BusyEvents { get; set; } = new List<BusyCalendarEvent>();
+
         public List<BusyCalendarEvent> GetBusyEvents()
         {
 
             List<BusyCalendarEvent> BusyEvents = new List<BusyCalendarEvent>();
 
-            this.Reservations.ForEach(reservation =>
+            this.Reservations.ToList().ForEach(reservation =>
             {
                 reservation.GetEvents().ForEach(ev =>
                 {
-                    if (!this.GetBusyDates().Contains(ev.DateTimePeriod.StartDate))
+                    bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
+                    {
+                        return ev.DateTimePeriod.IsPeriodOverlappedByPeriod(busyEve.DateTimePeriod);
+                    });
+                    if (!busyDayAlreadyExists)
                     {
                         //adds a new date as "busy"
                         BusyEvents.Add(new BusyCalendarEvent(reservation, ev.DateTimePeriod.StartDate));
@@ -95,6 +99,7 @@ namespace dogsitting_backend.Domain
                 });
             });
             BusyEvents.ForEach(ev => { ev.ComputeBusyness(this); });
+            this.BusyEvents = BusyEvents;
             return BusyEvents;
             //create a list of fulltime day events with a condition on the calendar setting to determine
             //if each day is full / busy / free

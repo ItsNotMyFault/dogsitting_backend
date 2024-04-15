@@ -19,6 +19,7 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<List<Team>> GetAllTeamsAsync()
         {
+
             return await this.context.Teams.Include(t => t.Admins).ToListAsync();
         }
 

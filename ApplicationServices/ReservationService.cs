@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace dogsitting_backend.ApplicationServices
 {
@@ -29,10 +30,15 @@ namespace dogsitting_backend.ApplicationServices
             //var calendars = this._calendarGenereicRepository.GetAll();
 
             //works
-            //var calendars = this._calendarGenereicRepository.Build().Include("Team").ToList();
-            var calendars = this._calendarGenereicRepository.Build().Include("Reservations").ToList();
+            List<Calendar> calendars = this._calendarGenereicRepository.Build()
+                .Include(t => t.Team)
+                .Include(t => t.Reservations)
+                .ThenInclude(t => t.Client).ToList();
+            //var calendars = this._calendarGenereicRepository.Build().Include(t => t.Team).ThenInclude(t => t.Admins);
+            //var calendars = this._calendarGenereicRepository.Build().Include("Reservations").ToList();
             Calendar testCalendar = calendars.First();
-
+            testCalendar.GetArrivalDepartureEvents();
+            testCalendar.GetBusyEvents();
 
 
             //TODO breaks HERE

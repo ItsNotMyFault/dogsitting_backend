@@ -1,7 +1,9 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dogsitting_backend.Domain
 {
+    [NotMapped]
     public class CalendarEvent
     {
         public Guid Id { get; set; }
@@ -12,6 +14,7 @@ namespace dogsitting_backend.Domain
         public bool IsAllDayEvent { get; set; }
         public CalendarEvent(string eventSubject)
         {
+            this.EventSubject = eventSubject;
             this.Id = Guid.NewGuid();
         }
 
@@ -24,6 +27,7 @@ namespace dogsitting_backend.Domain
 
         public CalendarEvent(DateTimePeriod DateTimePeriod, FreeBusyStatus EventStatus)
         {
+            this.DateTimePeriod = DateTimePeriod;
             this.Id = Guid.NewGuid();
             SetIsPeriodAllDay();
         }
@@ -31,6 +35,11 @@ namespace dogsitting_backend.Domain
         private void SetIsPeriodAllDay()
         {
             this.IsAllDayEvent = this.DateTimePeriod.IsASingleFullDay() || this.DateTimePeriod.IsMultipleDays();
+        }
+
+        public override string ToString()
+        {
+            return $"{this.EventSubject} {this.DateTimePeriod.StartDate.ToString("yyyy-MM-dd")}";
         }
 
 

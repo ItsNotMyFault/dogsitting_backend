@@ -3,13 +3,15 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Security.Principal;
 using System.Text.Json.Serialization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace dogsitting_backend.domain;
+namespace dogsitting_backend.Domain;
 
-public class ApplicationUser :DBModel
+public class ApplicationUser : DBModel, IIdentity
 {
     public ApplicationUser() { }
     public ApplicationUser(string firstName, string lastName)
@@ -29,9 +31,30 @@ public class ApplicationUser :DBModel
     public ICollection<Team> Teams { get; } = [];
     //public string Email { get; set; }
     //public int Enable { get; set; }
-
-    public IList<Reservation> Reservations{ get; set; }
+    [Newtonsoft.Json.JsonIgnore]
+    public virtual IList<Reservation> Reservations { get; set; }
     public IList<ApplicationRole> Roles { get; set; }
+
+    [NotMapped]
+    [Newtonsoft.Json.JsonIgnore]
+    public  string? AuthenticationType
+    {
+        get => "authType";
+        set
+        {
+            AuthenticationType = "yes";
+        }
+    }
+    [NotMapped]
+    [Newtonsoft.Json.JsonIgnore]
+    public bool IsAuthenticated
+    {
+        get => IsAuthenticated;
+        set
+        {
+            IsAuthenticated = false;
+        }
+    }
 
     public bool HasRole(string roleName)
     {

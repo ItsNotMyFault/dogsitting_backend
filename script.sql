@@ -75,7 +75,7 @@ insert into calendars (id, teamId, MaxWeekDaysLodgerCount, MaxWeekendDaysLodgerC
 
 select * from calendars;
 
-select * from reservations;
+
 
 #ALTER TABLE users ADD CONSTRAINT fk_grade_id FOREIGN KEY (grade_id) REFERENCES grades(id);
 CREATE TABLE Reservations (
@@ -88,12 +88,13 @@ CREATE TABLE Reservations (
     CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
     CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
 );
-insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-01-01", "2024-12-01", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-10", "2024-04-15", 3, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
 insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-01", "2024-04-25", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
-insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-05-01", "2024-05-12", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-05-01", "2024-05-12", 1, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
 select * from calendars inner join reservations on reservations.calendarId = calendars.id where teamId = "2e731e68-f682-11ee-a26a-00155dd4f30d";
-
-
+#SET SQL_SAFE_UPDATES = 0;
+delete from reservations where id is not null;
+#SET SQL_SAFE_UPDATES = 1;
 #UUID()
 
 

@@ -39,7 +39,7 @@ namespace dogsitting_backend.Controllers
             };
             string json = JsonConvert.SerializeObject(test, settings);
             return Ok(json);
-        }
 
+        }
     }
 }

@@ -1,6 +1,5 @@
-﻿using System;
-
-namespace dogsitting_backend.domain
+﻿
+namespace dogsitting_backend.Domain
 {
     public class ApplicationRole
     {

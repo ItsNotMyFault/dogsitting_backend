@@ -1,7 +1,4 @@
-﻿using dogsitting_backend.domain;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dogsitting_backend.Domain
@@ -17,7 +14,6 @@ namespace dogsitting_backend.Domain
         public DateTime DateTo { get; set; }
 
         // Map DateFrom and DateTo fields to DateTimePeriod inner class
-        [NotMapped]
         public DateTimePeriod Period
         {
             get => new DateTimePeriod(this.DateFrom, this.DateTo);
@@ -27,9 +23,13 @@ namespace dogsitting_backend.Domain
                 DateTo = value.EndDate;
             }
         }
-        [NotMapped]
-        public ApplicationUser Client { get; set; }
-        public Calendar Calendar{ get; set; }
+
+        [ForeignKey("Client")]
+        public Guid UserId { get; set; }
+        public virtual ApplicationUser Client { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
+        public virtual Calendar Calendar { get; set; }
+
         public Guid CalendarId { get; set; }
 
         public int LodgerCount { get; set; } = 1;

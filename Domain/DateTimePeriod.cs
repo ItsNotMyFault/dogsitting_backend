@@ -109,8 +109,8 @@ namespace dogsitting_backend.Domain
 
         public bool IsPeriodOverlappedByPeriod(DateTimePeriod checkedPeriod)
         {
-            bool isCheckedPeriodStartingBefore = checkedPeriod.StartDate < this.StartDate;
-            bool isCheckedPeriodEndingLater = checkedPeriod.EndDate > this.EndDate;
+            bool isCheckedPeriodStartingBefore = checkedPeriod.StartDate <= this.StartDate;
+            bool isCheckedPeriodEndingLater = checkedPeriod.EndDate >= this.EndDate;
             return isCheckedPeriodStartingBefore && isCheckedPeriodEndingLater;
         }
         public bool IsSamePeriod(DateTimePeriod checkedPeriod)

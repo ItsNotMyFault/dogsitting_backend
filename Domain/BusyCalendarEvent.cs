@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
 
 namespace dogsitting_backend.Domain
 {
+    [NotMapped]
     public class BusyCalendarEvent : CalendarEvent
     {
         private Guid _id;
@@ -24,6 +26,8 @@ namespace dogsitting_backend.Domain
         public void AddLodger(int count = 1)
         {
             this.LodgerCount += count;
+            this.EventSubject = $"Occupé {this.LodgerCount}";
+
         }
 
         public void ComputeBusyness(Calendar calendar)

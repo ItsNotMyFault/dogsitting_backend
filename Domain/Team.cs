@@ -1,17 +1,11 @@
-﻿using dogsitting_backend.domain;
-using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
-
-namespace dogsitting_backend.Domain
+﻿namespace dogsitting_backend.Domain
 {
     public class Team : DBModel
     {
         public string Name { get; set; }
 
-        public ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
-        public Calendar Calendar { get; set; }
+        public virtual ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
+        public virtual Calendar Calendar { get; set; }
 
         public Team()
         {

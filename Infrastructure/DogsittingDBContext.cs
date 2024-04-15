@@ -1,5 +1,4 @@
-﻿using dogsitting_backend.domain;
-using dogsitting_backend.Domain;
+﻿using dogsitting_backend.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace dogsitting_backend.Infrastructure
@@ -12,6 +11,7 @@ namespace dogsitting_backend.Infrastructure
         }
 
         public DbSet<Team> Teams { get; set; }
+        public DbSet<Calendar> Calendars{ get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<ApplicationRole> Roles{ get; set; }
         public DbSet<Reservation> Reservations{ get; set; }
