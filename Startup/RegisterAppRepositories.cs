@@ -4,15 +4,15 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace dogsitting_backend.Startup
 {
-    public static class AppServicesConfiguration
+    public static class RegisterAppRepositories
     {
-        public static void AddServices(this IServiceCollection services)
+        public static void AddRepositories(this IServiceCollection services)
         {
             
-            services.AddTransient<TeamService>();
-            services.AddTransient<ReservationService>();
             services.AddTransient<TeamSQLRepository>();
             services.AddTransient<ReservationSQLRepository>();
+            services.AddTransient<UserSQLRepository>();
+            services.AddTransient<RoleSQLRepository>();
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         }

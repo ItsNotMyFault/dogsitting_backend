@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace dogsitting_backend.Domain
 {
     [Table("Reservations")]
-    public class Reservation
+    public class Reservation :DBModel
     {
-        [Key]
-        public Guid Id { get; set; }
 
         // Define backing fields for DateFrom and DateTo
         public DateTime DateFrom { get; set; }
@@ -27,6 +25,7 @@ namespace dogsitting_backend.Domain
         [ForeignKey("Client")]
         public Guid UserId { get; set; }
         public virtual ApplicationUser Client { get; set; }
+
         [Newtonsoft.Json.JsonIgnore]
         public virtual Calendar Calendar { get; set; }
 

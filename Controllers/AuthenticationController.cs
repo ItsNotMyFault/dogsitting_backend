@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using dogsitting_backend.Domain;
 using Google.Protobuf.WellKnownTypes;
+using dogsitting_backend.ApplicationServices;
 
 namespace dogsitting_backend.Controllers
 {
@@ -12,10 +13,12 @@ namespace dogsitting_backend.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly ClaimsPrincipal claimsPrincipal;
+        private UserService userService;
 
-        public AuthenticationController(IHttpContextAccessor httpContextAccessor)
+        public AuthenticationController(IHttpContextAccessor httpContextAccessor, UserService userService)
         {
             this.claimsPrincipal = httpContextAccessor.HttpContext.User;
+            this.userService = userService;
 
         }
 
@@ -27,7 +30,8 @@ namespace dogsitting_backend.Controllers
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = Url.Action(nameof(FacebookLoginCallback))
+                RedirectUri = "https://localhost:5188/Boom"
+                //RedirectUri = Url.Action(nameof(FacebookLoginCallback))
             };
 
             return Challenge(properties, "Facebook");
@@ -52,7 +56,7 @@ namespace dogsitting_backend.Controllers
 
 
         [AllowAnonymous]
-        [HttpGet("accessdenied")]
+        [HttpGet("AccessDeniedPathInfo")]
         public IActionResult Accessdenied()
         {
             return Ok("fail");

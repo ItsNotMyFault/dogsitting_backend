@@ -40,7 +40,7 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public ActionResult Jambon()
         {
-            List<Team> teams = this.teamService.GetTeamsInclude().Result.ToList();
+            List<Team> teams = this.teamService.GetTeamsWithAdmins().Result.ToList();
             string json = JsonConvert.SerializeObject(teams);
 
             return Ok(json);
@@ -50,7 +50,7 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public ActionResult Jambon2()
         {
-            List<Team> teams = this.teamService.GetTeamsInclude().Result.ToList();
+            List<Team> teams = this.teamService.GetTeamsWithAdmins().Result.ToList();
             string json = JsonConvert.SerializeObject(teams);
 
             return Ok(json);

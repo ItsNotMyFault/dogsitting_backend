@@ -20,6 +20,7 @@ var isdev = Environment.IsDevelopment();
 services.AddSingleton<IConfiguration>(Configuration);
 
 builder.Services.AddServices();
+builder.Services.AddRepositories();
 
 builder.Services.AddSession(options =>
 {

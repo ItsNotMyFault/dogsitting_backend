@@ -6,7 +6,10 @@ DROP TABLE userroles;
 DROP TABLE teamusers;
 DROP TABLE reservations;
 DROP TABLE Calendars;
+drop table teamusers;
 DROP TABLE teams;
+drop table userlogins;
+drop table usertokens;
 DROP TABLE USERS;
 
 
@@ -21,16 +24,52 @@ insert into Roles (id, name, displayName, description) values (UUID(), "SuperAdm
 
 CREATE TABLE Users (
     id varchar(255) PRIMARY KEY,
-    firstName varchar(255),
-    lastName varchar(255),
-    email varchar(255),
-    address varchar(255),
-    city varchar(255),
-    phone varchar(255)
+    UserName varchar(255) not null,
+    NormalizedUserName varchar(255) NULL default "",
+    Email varchar(255) not null default "",
+    NormalizedEmail varchar(255) NOT NULL default "",
+    EmailConfirmed bool not null default false,
+    PasswordHash varchar(6000) NULL default NULL,
+    FirstName varchar(255) NULL default "",
+    LastName varchar(255) NULL default "",
+    Address varchar(255) NULL default "",
+    City varchar(255) NULL default "",
+    PhoneNumber varchar(255) NULL default "",
+    PhoneNumberConfirmed bool NULL default false,
+    TwoFactorEnabled bool NULL default false,
+    LockoutEnd datetime NULL,
+    LockoutEnabled bool NULL default false,
+    AccessFailedCount int default 0 not null
 );
-insert into Users (id, firstname, lastname, address, city, phone) values ("8825c601-f5c0-11ee-a26a-00155dd4f30d", "firstname", "lastname", "address", "quebec", "555-555-5555");
-insert into Users (id, firstname, lastname, email, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "alexis", "guay", "alexis_raphael_guay@hotmail.com", "address", "quebec", "555-555-5555");
-insert into Users (id, firstname, lastname, address, city, phone) values ("e0b2801d-f67c-11ee-a26a-00155dd4f39d", "clientA", "clientA", "address", "quebec", "555-555-5555");
+
+insert into Users (id, UserName, NormalizedUserName, EmailConfirmed, PasswordHash, FirstName, LastName, Address, city, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount)
+ values ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "aguay", "AGUAY",  "alexis_raphael_guay@hotmail.com", true, "passwordhash", "alexis", "guay", "address", "quebec", "555-555-5555", true, false, "2024-05-05", false, 0);
+ 
+select * from Users2;
+
+CREATE TABLE UserLogins (
+    LoginProvider varchar(255) not null,
+    ProviderKey varchar(255) not null,
+    ProviderDisplayName varchar(255),
+    UserId varchar(255) not null,
+	PRIMARY KEY (LoginProvider, ProviderKey),
+	CONSTRAINT fk_UserLogins_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
+);
+insert into UserLogins (LoginProvider, ProviderKey, ProviderDisplayName, UserId) values ("Facebook", "badkey", "Facebook", "e0b2801d-f67c-11ee-a26a-00155dd4f30d");
+
+select * from Users;
+select * from Users inner join UserLogins on userLogins.UserId = users.id;
+
+CREATE TABLE UserTokens (
+    UserId varchar(255) not null,
+    LoginProvider varchar(255) not null,
+    Name varchar(255) not null, #name or type of the token
+    TokenValue varchar(6000) not null, 
+	PRIMARY KEY (UserId, LoginProvider, Name),
+	CONSTRAINT fk_UserTokens_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
+);
+
+
 CREATE TABLE UserRoles (
     id varchar(255) PRIMARY KEY,
     userId varchar(255),
@@ -96,6 +135,18 @@ select * from calendars inner join reservations on reservations.calendarId = cal
 delete from reservations where id is not null;
 #SET SQL_SAFE_UPDATES = 1;
 #UUID()
+
+
+CREATE TABLE LoginProvider (
+    id varchar(255) PRIMARY KEY,
+    dateFrom datetime,
+    dateTo datetime,
+    lodgerCount integer,
+    userId varchar(255),
+    calendarId varchar(255),
+    CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
+    CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
+);
 
 
 

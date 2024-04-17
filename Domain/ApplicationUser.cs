@@ -1,18 +1,15 @@
-﻿using dogsitting_backend.Domain;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
+﻿using dogsitting_backend.Domain.auth;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
 using System.Security.Principal;
-using System.Text.Json.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace dogsitting_backend.Domain;
 
-public class ApplicationUser : DBModel, IIdentity
+public class ApplicationUser
 {
+    [Key]
+    public Guid Id { get; set; }
     public ApplicationUser() { }
     public ApplicationUser(string firstName, string lastName)
     {
@@ -28,45 +25,15 @@ public class ApplicationUser : DBModel, IIdentity
     public string Name { get => this.FirstName + " " + this.LastName; }
 
     [Newtonsoft.Json.JsonIgnore]
-    public ICollection<Team> Teams { get; } = [];
+    public ICollection<Team> Teams { get; } = new List<Team>();
     //public string Email { get; set; }
     //public int Enable { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public virtual IList<Reservation> Reservations { get; set; }
-    public IList<ApplicationRole> Roles { get; set; }
-
-    [NotMapped]
     [Newtonsoft.Json.JsonIgnore]
-    public  string? AuthenticationType
-    {
-        get => "authType";
-        set
-        {
-            AuthenticationType = "yes";
-        }
-    }
-    [NotMapped]
-    [Newtonsoft.Json.JsonIgnore]
-    public bool IsAuthenticated
-    {
-        get => IsAuthenticated;
-        set
-        {
-            IsAuthenticated = false;
-        }
-    }
+    public virtual IList<ApplicationRole> Roles { get; set; }
+    public virtual IList<UserLogin> UserLogins { get; set; } = new List<UserLogin>();
 
-    public bool HasRole(string roleName)
-    {
-        bool hasRole = this.Roles.Select(x => x.Name).Contains(roleName.ToUpper());
-        return hasRole;
-    }
-
-    public bool HasOneOfThoseRoles(List<string> rolesName)
-    {
-        bool hasOneofTheRoles = rolesName.Select(x => this.HasRole(x)).Contains(true);
-        return hasOneofTheRoles;
-    }
 
 }
 

@@ -23,9 +23,10 @@ namespace dogsitting_backend.ApplicationServices
             return await _teamGenericRepository.GetAllAsync();
         }
 
-        public async Task<IEnumerable<Team>> GetTeamsInclude()
+        public async Task<IEnumerable<Team>> GetTeamsWithAdmins()
         {
             return await _teamSQLRepository.GetAllTeamsAsync();
+            //return await _teamSQLRepository.GetAllTeamsAsync();
         }
 
         public async Task<Team> PostTeamAsync(Team team)

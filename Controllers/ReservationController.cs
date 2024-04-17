@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 
 namespace dogsitting_backend.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
     [Authorize]
     public class ReservationController : ControllerBase
@@ -18,7 +17,7 @@ namespace dogsitting_backend.Controllers
         }
 
 
-        [HttpGet(Name = "GetReservation")]
+        [HttpGet(Name = "Reservation")]
         public async Task<ActionResult> Get()
         {
             Calendar test = await this.ReservationService.GetReservations(null);

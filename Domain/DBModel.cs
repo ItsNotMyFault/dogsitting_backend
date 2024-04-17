@@ -6,5 +6,6 @@ namespace dogsitting_backend.Domain
     {
         [Key]
         public Guid Id { get; set; }
+
     }
 }

@@ -27,7 +27,7 @@ namespace dogsitting_backend.Infrastructure
             return _dbContext.Set<T>();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(Guid id)
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }
@@ -49,5 +49,6 @@ namespace dogsitting_backend.Infrastructure
             _dbContext.Set<T>().Remove(entity);
             await _dbContext.SaveChangesAsync();
         }
+
     }
 }
