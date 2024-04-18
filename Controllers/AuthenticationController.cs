@@ -30,16 +30,16 @@ namespace dogsitting_backend.Controllers
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = "https://localhost:5188/Boom"
+                RedirectUri = "https://localhost:4000"
+                //RedirectUri = "https://localhost:5188"
                 //RedirectUri = Url.Action(nameof(FacebookLoginCallback))
             };
-
             return Challenge(properties, "Facebook");
         }
 
         [AllowAnonymous]
         [HttpGet("signin-facebook")]
-        public async Task<IActionResult> FacebookLoginCallback()
+        public async Task<IActionResult> FacebookLoginCallback(Object context)
         {
             var authenticateResult = await HttpContext.AuthenticateAsync("Facebook");
 

@@ -1,6 +1,7 @@
 ﻿using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
@@ -17,20 +18,23 @@ namespace dogsitting_backend.Controllers
     public class CalendarController : ControllerBase
     {
         private ReservationService ReservationService;
-        public CalendarController(ReservationService reservationService)
+        public CalendarController(ReservationService reservationService, IHttpContextAccessor httpContextAccessor)
         {
             this.ReservationService = reservationService;
+            var claimsPrincipal = httpContextAccessor.HttpContext.User;
         }
 
 
-        [HttpGet(Name = "GetCalendar")]
-        public async Task<ActionResult> Get()
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("team/{team}")]
+        public async Task<ActionResult> Get([FromRoute] string team)
         {
             //param => mode client, mode admin (default selon le login)
 
             //param mode busy-available /  mode departure events / mode list reservations (default).
 
-            var test = await this.ReservationService.GetReservations(null);
+            var test = await this.ReservationService.GetCalendar(team);
             //List<Reservation> reservations = this.ReservationService.GetReservationsByUserId(null).Result.ToList();
             //List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
             var settings = new JsonSerializerSettings

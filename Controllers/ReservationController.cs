@@ -20,7 +20,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet(Name = "Reservation")]
         public async Task<ActionResult> Get()
         {
-            Calendar test = await this.ReservationService.GetReservations(null);
+            Calendar test = await this.ReservationService.GetCalendar(null);
    
             var settings = new JsonSerializerSettings
             {

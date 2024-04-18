@@ -2,6 +2,7 @@
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Infrastructure;
 using dogsitting_backend.Infrastructure.store;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -35,6 +36,7 @@ namespace dogsitting_backend.Startup
                 facebookOptions.AppId = appid;
                 facebookOptions.AppSecret = appsecret;
                 facebookOptions.AccessDeniedPath = "/AccessDeniedPathInfo";
+                facebookOptions.AuthorizationEndpoint = "https://www.facebook.com/v14.0/dialog/oauth";
                 //facebookOptions.SaveTokens = true;
                 facebookOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents()
                 {
@@ -55,7 +57,19 @@ namespace dogsitting_backend.Startup
                     },
                     OnRedirectToAuthorizationEndpoint = async context =>
                     {
-                        context.HttpContext.Response.Redirect(context.RedirectUri + "&display=popup&pip");
+                        var request = context.Request;
+                        string facebookOauthUrl = context.RedirectUri + "&display=popup&pip";
+                        //HttpClient client = new();
+
+                        //HttpResponseMessage response = client.PostAsync(context.RedirectUri + "&display=popup&pip", null).Result;
+                        //string responseString = await response.Content.ReadAsStringAsync();
+                        //if (!response.IsSuccessStatusCode)
+                        //{
+                        //    throw new HttpRequestException($"POST: {response.StatusCode} => {response.ReasonPhrase} : {responseString}", new HttpRequestException(), response.StatusCode);
+                        //}
+
+
+                        context.HttpContext.Response.Redirect(facebookOauthUrl);
                         await Task.CompletedTask;
                     },
                     OnRemoteFailure = async context =>
@@ -84,28 +98,6 @@ namespace dogsitting_backend.Startup
 
 
 
-        }
-        //.AddCookie(IdentityConstants.ApplicationScheme)
-
-        public static void AddJWTBearer(this IServiceCollection services)
-        {
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddBearerToken("facebook", options =>
-            {
-                options.Events = new BearerTokenEvents()
-                {
-                    
-                    OnMessageReceived = async context =>
-                    {
-                        await Task.CompletedTask;
-                    },
-                };
-            });
         }
     }
 }

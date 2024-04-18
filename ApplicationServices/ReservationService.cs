@@ -22,7 +22,7 @@ namespace dogsitting_backend.ApplicationServices
             this.ReservationSQLRepository = reservationSQLRepository;
         }
 
-        public async Task<Calendar> GetReservations(string param)
+        public async Task<Calendar> GetCalendar(string param)
         {
 
             //check current logged in User.

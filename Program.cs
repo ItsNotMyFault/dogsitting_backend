@@ -2,6 +2,7 @@ using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Infrastructure;
 using dogsitting_backend.Startup;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -67,15 +68,20 @@ builder.Services.AddHttpContextAccessor();
 
 services.AddCors(options =>
 {
-    options.AddPolicy("MyPolicy",
+    options.AddPolicy("VueCorsPolicy",
         builder =>
         {
             builder.WithOrigins(new string[] {
-                                "http://localhost:5188",
-            }).SetIsOriginAllowedToAllowWildcardSubdomains()
+                "http://localhost:4000",
+                "https://localhost:4000",
+                "http://localhost:5188",
+                "https://localhost:5188",
+                "https://www.facebook.com"
+            })
+            //.SetIsOriginAllowedToAllowWildcardSubdomains()
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
+            //.AllowCredentials();
         });
 });
 
@@ -89,6 +95,12 @@ builder.Services.AddDbContext<DogsittingDBContext>(options =>
 builder.Services.AddMvc();
 builder.Logging.AddConsole();
 
+
+services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+});
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -116,7 +128,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
 }
 
-app.UseCors("MyPolicy");
+app.UseCors("VueCorsPolicy");
 app.UseHttpsRedirection();
 app.UseCookiePolicy();
 

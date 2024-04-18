@@ -54,16 +54,14 @@ namespace dogsitting_backend.Domain
             List<DateTime> arrivalDates = this.Reservations.Select(reservation => reservation.DateFrom).Distinct().ToList();
             List<DateTime> departureDates = this.Reservations.Select(reservation => reservation.DateTo).Distinct().ToList();
 
-            List<CalendarEvent> arrivalEvents = [];
-            List<CalendarEvent> departureEvents = [];
             foreach (Reservation reservation in Reservations.Where(r => arrivalDates.Contains(r.DateFrom)))
             {
-                arrivalEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (arrival)"));
+                ArrivalEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (arrival)"));
             }
 
             foreach (Reservation reservation in Reservations.Where(r => departureDates.Contains(r.DateTo)))
             {
-                departureEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (departure)"));
+                DepartureEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (departure)"));
             }
 
             return null;
@@ -71,6 +69,8 @@ namespace dogsitting_backend.Domain
         }
 
         public List<BusyCalendarEvent> BusyEvents { get; set; } = new List<BusyCalendarEvent>();
+        public List<CalendarEvent> DepartureEvents { get; set; } = new List<CalendarEvent>();
+        public List<CalendarEvent> ArrivalEvents { get; set; } = new List<CalendarEvent>();
 
         public List<BusyCalendarEvent> GetBusyEvents()
         {
