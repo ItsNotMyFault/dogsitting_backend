@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
+using dogsitting_backend.Domain.calendar;
 using Microsoft.EntityFrameworkCore;
 
 namespace dogsitting_backend.Infrastructure

@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.calendar;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -20,7 +21,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet(Name = "Reservation")]
         public async Task<ActionResult> Get()
         {
-            Calendar test = await this.ReservationService.GetCalendar(null);
+            Calendar test = await this.ReservationService.GetTeamCalendar(null);
    
             var settings = new JsonSerializerSettings
             {

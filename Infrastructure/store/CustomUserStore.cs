@@ -291,7 +291,8 @@ namespace dogsitting_backend.Infrastructure.store
         public Task<IList<string>> GetRolesAsync(AuthUser user, CancellationToken cancellationToken)
         {
             List<ApplicationRole> userRoles = this.RoleSQLRepository.GetUserRolesAsync(user.ApplicationUser).Result;
-            return Task.FromResult<IList<string>>(userRoles.Select(t => t.Name).ToList());
+            var roles = Task.FromResult<IList<string>>(userRoles.Select(t => t.NormalizedName).ToList());
+            return roles;
         }
 
         public Task<bool> IsInRoleAsync(AuthUser user, string roleName, CancellationToken cancellationToken)

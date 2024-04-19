@@ -1,5 +1,5 @@
 ﻿using dogsitting_backend.ApplicationServices;
-using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,23 +27,42 @@ namespace dogsitting_backend.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        [Route("team/{team}")]
-        public async Task<ActionResult> Get([FromRoute] string team)
+        [Route("team/{team}/arrivaldepartures")]
+        public async Task<ActionResult> GetArrivalDepartures([FromRoute] string team)
+        {
+            List<CalendarEvent> departureEvents = await this.ReservationService.GetCalendarDepartureEvents(team);
+            List<CalendarEvent> arrivalEvents = await this.ReservationService.GetCalendarArrivalEvents(team);
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            string json = JsonConvert.SerializeObject(new
+            {
+                DepartureEvents = departureEvents,
+                ArrivalEvents = arrivalEvents
+            }, settings);
+            return Ok(json);
+
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("team/{team}/busyevents")]
+        public async Task<ActionResult> GetBusyEvents([FromRoute] string team)
         {
             //param => mode client, mode admin (default selon le login)
 
             //param mode busy-available /  mode departure events / mode list reservations (default).
 
-            var test = await this.ReservationService.GetCalendar(team);
-            //List<Reservation> reservations = this.ReservationService.GetReservationsByUserId(null).Result.ToList();
-            //List<Reservation> reservations = this.ReservationService.GetReservations().Result.ToList();
+            List<BusyCalendarEvent> events = await this.ReservationService.GetCalendarBusyEvents(team);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             };
-            string json = JsonConvert.SerializeObject(test, settings);
+            string json = JsonConvert.SerializeObject(events, settings);
             return Ok(json);
 
         }
+        //
     }
 }

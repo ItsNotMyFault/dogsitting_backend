@@ -96,6 +96,13 @@ namespace dogsitting_backend.Startup
                 opts.Password.RequireNonAlphanumeric = false;
             });
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy(AppRolePolicy.PolicyAdmin.ToString(), policy => policy.RequireRole("ADMIN", "SUPERADMIN", "SuperAdmin"));
+                options.AddPolicy(AppRolePolicy.PolicyClient.ToString(), policy => policy.RequireRole("ADMIN", "CLIENT", "SUPERADMIN", "SuperAdmin"));
+                options.AddPolicy(AppRolePolicy.PolicySuperAdmin.ToString(), policy => policy.RequireRole("ADMIN", "SUPERADMIN", "SuperAdmin"));
+            });
+
 
 
         }

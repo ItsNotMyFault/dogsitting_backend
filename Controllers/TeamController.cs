@@ -14,8 +14,7 @@ using System.Threading.Tasks;
 
 namespace dogsitting_backend.Controllers
 {
-    [AllowAnonymous]
-    //[ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class TeamController : ControllerBase
     {
@@ -36,9 +35,10 @@ namespace dogsitting_backend.Controllers
         //    return Ok(json);
         //}
 
-        [HttpGet(Name ="Team")]
+        //[HttpGet(Name ="Team")]
+        [HttpGet]
         [AllowAnonymous]
-        public ActionResult Jambon()
+        public ActionResult GetTeams()
         {
             List<Team> teams = this.teamService.GetTeamsWithAdmins().Result.ToList();
             string json = JsonConvert.SerializeObject(teams);
@@ -46,20 +46,20 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
-        [HttpGet("Boom")]
+        [HttpGet("{teamNormalizedName}")]
         [AllowAnonymous]
-        public ActionResult Jambon2()
+        public async Task<ActionResult> GetTeamByNormalizedName([FromRoute]string teamNormalizedName)
         {
-            List<Team> teams = this.teamService.GetTeamsWithAdmins().Result.ToList();
-            string json = JsonConvert.SerializeObject(teams);
-
+            Team team = await this.teamService.GetTeamByNormalizedName(teamNormalizedName);
+            string json = JsonConvert.SerializeObject(team);
             return Ok(json);
         }
 
 
-        [HttpPost(Name = "PostTeam")]
-        [AllowAnonymous]
-        public async Task<ActionResult> Post(Team team)
+        [HttpPost]
+        [Authorize(Policy = "PolicyAdmin")]
+        [Route("create")]
+        public async Task<ActionResult> Post([FromBody] Team team)
         {
             await this.teamService.PostTeamAsync(team);
             return Ok(JsonConvert.SerializeObject(team));

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace dogsitting_backend.Domain
+namespace dogsitting_backend.Domain.calendar
 {
     public class Calendar
     {
@@ -35,13 +35,13 @@ namespace dogsitting_backend.Domain
         public Calendar()
         {
 
-            this.Reservations = [];
+            Reservations = [];
         }
 
         public List<CalendarEvent> GetDailyCalendarEvents()
         {
             List<CalendarEvent> events = [];
-            foreach (DateTime datetime in this.GeneralPeriod.EachDay())
+            foreach (DateTime datetime in GeneralPeriod.EachDay())
             {
                 events.Add(new CalendarEvent(datetime));
             };
@@ -49,24 +49,31 @@ namespace dogsitting_backend.Domain
         }
 
         //arrival and departure of lodgers, create events for each arrival/departure.
-        public Object GetArrivalDepartureEvents()
+        public List<CalendarEvent> GetArrivalEvents()
         {
-            List<DateTime> arrivalDates = this.Reservations.Select(reservation => reservation.DateFrom).Distinct().ToList();
-            List<DateTime> departureDates = this.Reservations.Select(reservation => reservation.DateTo).Distinct().ToList();
-
+            List<DateTime> arrivalDates = Reservations.Select(reservation => reservation.DateFrom).Distinct().ToList();
             foreach (Reservation reservation in Reservations.Where(r => arrivalDates.Contains(r.DateFrom)))
             {
                 ArrivalEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (arrival)"));
             }
+            return ArrivalEvents;
+        }
+
+        public List<CalendarEvent> GetDepartureEvents()
+        {
+            List<DateTime> arrivalDates = Reservations.Select(reservation => reservation.DateFrom).Distinct().ToList();
+            List<DateTime> departureDates = Reservations.Select(reservation => reservation.DateTo).Distinct().ToList();
 
             foreach (Reservation reservation in Reservations.Where(r => departureDates.Contains(r.DateTo)))
             {
                 DepartureEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (departure)"));
             }
 
-            return null;
+            return DepartureEvents;
 
         }
+
+
 
         public List<BusyCalendarEvent> BusyEvents { get; set; } = new List<BusyCalendarEvent>();
         public List<CalendarEvent> DepartureEvents { get; set; } = new List<CalendarEvent>();
@@ -77,7 +84,7 @@ namespace dogsitting_backend.Domain
 
             List<BusyCalendarEvent> BusyEvents = new List<BusyCalendarEvent>();
 
-            this.Reservations.ToList().ForEach(reservation =>
+            Reservations.ToList().ForEach(reservation =>
             {
                 reservation.GetEvents().ForEach(ev =>
                 {

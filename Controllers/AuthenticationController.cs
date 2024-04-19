@@ -56,9 +56,10 @@ namespace dogsitting_backend.Controllers
 
 
         [AllowAnonymous]
-        [HttpGet("AccessDeniedPathInfo")]
+        [HttpGet("accessdenied")]
         public IActionResult Accessdenied()
         {
+            this.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
             return Ok("fail");
         }
 

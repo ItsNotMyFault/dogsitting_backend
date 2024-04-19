@@ -15,12 +15,16 @@ DROP TABLE USERS;
 
 CREATE TABLE Roles (
     id varchar(255) PRIMARY KEY,
-    name varchar(255),
-    displayName varchar(255),
+    name varchar(255) not null,
+    NormalizedName varchar(255) not null default '',
+    displayName varchar(255) not null default '',
     description varchar(255)
 );
-insert into Roles (id, name, displayName, description) values (UUID(), "Admin", "Administrateur", "A les permissions pour géré une équipe");
-insert into Roles (id, name, displayName, description) values (UUID(), "SuperAdmin", "Super Administrateur", "A toutes les permissions pour géré l'ensemble des équipes.");
+insert into Roles (id, name, NormalizedName, displayName, description) values (UUID(), "Admin", "ADMIN","Administrateur", "A les permissions pour géré une équipe");
+insert into Roles (id, name, NormalizedName, displayName, description) values (UUID(), "SuperAdmin", "SUPERADMIN", "Super Administrateur", "A toutes les permissions pour géré l'ensemble des équipes.");
+
+select * from users inner join userroles on userroles.userId = users.id inner join roles on roles.id = userroles.roleId;
+select * from roles;
 
 CREATE TABLE Users (
     id varchar(255) PRIMARY KEY,
@@ -45,7 +49,28 @@ CREATE TABLE Users (
 insert into Users (id, UserName, NormalizedUserName, EmailConfirmed, PasswordHash, FirstName, LastName, Address, city, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount)
  values ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "aguay", "AGUAY",  "alexis_raphael_guay@hotmail.com", true, "passwordhash", "alexis", "guay", "address", "quebec", "555-555-5555", true, false, "2024-05-05", false, 0);
  
-select * from Users2;
+ INSERT INTO Users (id, UserName, NormalizedUserName, Email, NormalizedEmail, EmailConfirmed, PasswordHash, FirstName, LastName, Address, City, PhoneNumber, PhoneNumberConfirmed, TwoFactorEnabled, LockoutEnd, LockoutEnabled, AccessFailedCount)
+VALUES ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "aguay", "AGUAY", "alexis_raphael_guay@hotmail.com", "ALEXIS_RAPHAEL_GUAY@HOTMAIL.COM", true, "actual_password_hash", "alexis", "guay", "address", "quebec", "555-555-5555", true, false, '2024-05-05 00:00:00', false, 0);
+ 
+ CREATE TABLE UserRoles (
+    id varchar(255) PRIMARY KEY,
+    userId varchar(255),
+    roleId varchar(255)
+);
+ 
+ insert into UserRoles (id, userId, roleId) values(UUID(), "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2761adc6-fd92-11ee-89f0-00155dbc9e2a");
+ insert into UserRoles (id, userId, roleId) values(UUID(), "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "289bebd9-fd92-11ee-89f0-00155dbc9e2a");
+ select * from roles;
+ select * from teams;
+ 
+ select * from calendars;
+ 
+ 
+
+
+ 
+select * from Users;
+
 
 CREATE TABLE UserLogins (
     LoginProvider varchar(255) not null,
@@ -59,6 +84,8 @@ insert into UserLogins (LoginProvider, ProviderKey, ProviderDisplayName, UserId)
 
 select * from Users;
 select * from Users inner join UserLogins on userLogins.UserId = users.id;
+select * from UserLogins;
+select * from Roles;
 
 CREATE TABLE UserTokens (
     UserId varchar(255) not null,
@@ -69,12 +96,9 @@ CREATE TABLE UserTokens (
 	CONSTRAINT fk_UserTokens_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
 );
 
+select * from teams;
 
-CREATE TABLE UserRoles (
-    id varchar(255) PRIMARY KEY,
-    userId varchar(255),
-    roleId varchar(255)
-);
+
 
 select * from users inner join TeamUsers on TeamUsers.userId = users.id where users.id = 'e0b2801d-f67c-11ee-a26a-00155dd4f30d';
 #give possibility to switch team from user interface, being in multiple teams.
@@ -84,8 +108,22 @@ select * from users inner join TeamUsers on TeamUsers.userId = users.id where us
 
 CREATE TABLE Teams (
     id varchar(255) PRIMARY KEY,
-    name varchar(255)
+    Name varchar(255) not null default '',
+    NormalizedName varchar(255) not null default '',
+    CreatedAt datetime NULL,
+    ApprovedAt datetime NULL
 );
+
+ALTER TABLE teams ADD COLUMN CreatedAt datetime null;
+
+select * from teams;
+update Teams set NormalizedName = 'annieannick' where id = '2e731e68-f682-11ee-a26a-00155dd4f30d';
+update Teams set NormalizedName = 'alexis' where id = '2efa6903-f682-11ee-a26a-00155dd4f30d';
+update Teams set NormalizedName = 'anniel' where id = '2f68968c-f682-11ee-a26a-00155dd4f30d';
+
+#SET SQL_SAFE_UPDATES = 1;
+delete from teams where NormalizedName is null;
+select * from teams;
 
 CREATE TABLE TeamUsers (
     id varchar(255) PRIMARY KEY,
@@ -113,6 +151,7 @@ CREATE TABLE Calendars (
 insert into calendars (id, teamId, MaxWeekDaysLodgerCount, MaxWeekendDaysLodgerCount, UseAvailabilities, UseUnAvailabilities) values ("2e731e68-f682-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d", 1, 1, false, false);
 
 select * from calendars;
+select * from teams;
 
 
 
@@ -127,15 +166,20 @@ CREATE TABLE Reservations (
     CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
     CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
 );
-insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-10", "2024-04-15", 3, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
-insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-01", "2024-04-25", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
-insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-05-01", "2024-05-12", 1, "e0b2801d-f67c-11ee-a26a-00155dd4f39d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-10", "2024-04-15", 3, "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-04-01", "2024-04-25", 5, "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
+insert into reservations (id, dateFrom, dateTo, lodgerCount, userId, calendarId) values (UUID(), "2024-05-01", "2024-05-12", 1, "e0b2801d-f67c-11ee-a26a-00155dd4f30d", "2e731e68-f682-11ee-a26a-00155dd4f30d");
 select * from calendars inner join reservations on reservations.calendarId = calendars.id where teamId = "2e731e68-f682-11ee-a26a-00155dd4f30d";
+select * from teams where id = "2e731e68-f682-11ee-a26a-00155dd4f30d";
+
 #SET SQL_SAFE_UPDATES = 0;
 delete from reservations where id is not null;
+
+
+
 #SET SQL_SAFE_UPDATES = 1;
 #UUID()
-
+select * from reservations;
 
 CREATE TABLE LoginProvider (
     id varchar(255) PRIMARY KEY,

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using dogsitting_backend.Domain.calendar;
 
 namespace dogsitting_backend.Domain
 {

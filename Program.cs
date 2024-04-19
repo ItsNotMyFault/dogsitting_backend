@@ -56,12 +56,12 @@ services.ConfigureApplicationCookie(options =>
             ClaimsIdentity claimsIdentity = context.Principal.Identity as ClaimsIdentity;
             await Task.CompletedTask;
         },
+        
     };
 });
 
 
 builder.Services.AddOAuthServices();
-//builder.Services.AddJWTBearer();
 builder.Services.AddHttpContextAccessor();
 
 
@@ -128,6 +128,7 @@ using (var scope = app.Services.CreateScope())
     context.Database.EnsureCreated();
 }
 
+app.UseDeveloperExceptionPage();
 app.UseCors("VueCorsPolicy");
 app.UseHttpsRedirection();
 app.UseCookiePolicy();
@@ -135,8 +136,10 @@ app.UseCookiePolicy();
 app.UseHttpsRedirection();
 
 app.UseSession();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
+
+
 
 app.MapControllers();
 

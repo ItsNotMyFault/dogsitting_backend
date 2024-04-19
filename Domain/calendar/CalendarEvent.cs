@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace dogsitting_backend.Domain
+namespace dogsitting_backend.Domain.calendar
 {
     [NotMapped]
     public class CalendarEvent
@@ -14,32 +14,32 @@ namespace dogsitting_backend.Domain
         public bool IsAllDayEvent { get; set; }
         public CalendarEvent(string eventSubject)
         {
-            this.EventSubject = eventSubject;
-            this.Id = Guid.NewGuid();
+            EventSubject = eventSubject;
+            Id = Guid.NewGuid();
         }
 
         public CalendarEvent(DateTime dateTime)
         {
-            this.DateTimePeriod = new DateTimePeriod(dateTime);
-            this.Id = Guid.NewGuid();
+            DateTimePeriod = new DateTimePeriod(dateTime);
+            Id = Guid.NewGuid();
             SetIsPeriodAllDay();
         }
 
         public CalendarEvent(DateTimePeriod DateTimePeriod, FreeBusyStatus EventStatus)
         {
             this.DateTimePeriod = DateTimePeriod;
-            this.Id = Guid.NewGuid();
+            Id = Guid.NewGuid();
             SetIsPeriodAllDay();
         }
 
         private void SetIsPeriodAllDay()
         {
-            this.IsAllDayEvent = this.DateTimePeriod.IsASingleFullDay() || this.DateTimePeriod.IsMultipleDays();
+            IsAllDayEvent = DateTimePeriod.IsASingleFullDay() || DateTimePeriod.IsMultipleDays();
         }
 
         public override string ToString()
         {
-            return $"{this.EventSubject} {this.DateTimePeriod.StartDate.ToString("yyyy-MM-dd")}";
+            return $"{EventSubject} {DateTimePeriod.StartDate.ToString("yyyy-MM-dd")}";
         }
 
 
@@ -50,14 +50,14 @@ namespace dogsitting_backend.Domain
             bool isOverlapping = false;
             try
             {
-                isStartMomentInPeriod = this.DateTimePeriod.IsDateInBetweenDates(PeriodToCheck.StartDate);
-                isEndMomentInPeriod = this.DateTimePeriod.IsDateInBetweenDates(PeriodToCheck.EndDate);
-                isOverlapping = this.DateTimePeriod.IsPeriodOverlappedByPeriod(PeriodToCheck);
+                isStartMomentInPeriod = DateTimePeriod.IsDateInBetweenDates(PeriodToCheck.StartDate);
+                isEndMomentInPeriod = DateTimePeriod.IsDateInBetweenDates(PeriodToCheck.EndDate);
+                isOverlapping = DateTimePeriod.IsPeriodOverlappedByPeriod(PeriodToCheck);
             }
             catch (Exception)
             {
             }
-            return (isStartMomentInPeriod || isEndMomentInPeriod || isOverlapping);
+            return isStartMomentInPeriod || isEndMomentInPeriod || isOverlapping;
         }
     }
 }

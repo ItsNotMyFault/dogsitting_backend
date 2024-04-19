@@ -2,7 +2,9 @@
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,11 @@ namespace dogsitting_backend.ApplicationServices
         }
 
 
-
+        public async Task<AuthUser> GetCurrentUserAsync()
+        {
+            AuthUser applicationUser = await _userManager.GetUserAsync(this.claimsPrincipal);
+            return applicationUser;
+        }
 
         public async Task<bool> AuthenticateWithExternalProvider(ClaimsIdentity claimsIdentity, OAuthTokenResponse oAuthTokenResponse)
         {

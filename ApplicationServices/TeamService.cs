@@ -1,5 +1,7 @@
 ﻿using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
@@ -11,16 +13,33 @@ namespace dogsitting_backend.ApplicationServices
     {
         private readonly IGenericRepository<Team> _teamGenericRepository;
         private readonly TeamSQLRepository _teamSQLRepository;
+        private readonly UserManager<AuthUser> _userManager;
+        private readonly UserService _userService;
 
-        public TeamService(IGenericRepository<Team> teamGenereicRepository, TeamSQLRepository teamSQLRepository)
+        public TeamService(
+            IGenericRepository<Team> teamGenereicRepository,
+            TeamSQLRepository teamSQLRepository,
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<AuthUser> userManager,
+             UserService userService
+            )
         {
             _teamGenericRepository = teamGenereicRepository;
             _teamSQLRepository = teamSQLRepository;
+            _userManager = userManager;
+            this._userService = userService;
+            var claimsPrincipal = httpContextAccessor.HttpContext.User;
+            AuthUser res = _userManager.GetUserAsync(claimsPrincipal).Result;
         }
 
         public async Task<IEnumerable<Team>> GetAllTeamsAsync()
         {
             return await _teamGenericRepository.GetAllAsync();
+        }
+
+        public async Task<Team> GetTeamByNormalizedName(string teamNormalizedName)
+        {
+            return await _teamSQLRepository.GetTeamByNormalizedName(teamNormalizedName);
         }
 
         public async Task<IEnumerable<Team>> GetTeamsWithAdmins()
@@ -31,14 +50,27 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<Team> PostTeamAsync(Team team)
         {
-            this.ComplexCommand();
+            //get logged in user, check if he is already mapped to a team, if yes boom.
+            //if not accept creation.
+            AuthUser user = this._userService.GetCurrentUserAsync().Result;
+            Team foundTeam = null;
+            try
+            {
+                foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
+            }
+            catch (Exception ex)
+            {
+                var e = ex;
+            }
+            if (foundTeam != null)
+            {
+                throw new Exception("This user already has a team assigned to it.");
+            }
+
+            team.NormalizeTeamName();
+            team.Admins.Add(user.ApplicationUser);
             await _teamGenericRepository.AddAsync(team);
             return team;
-        }
-
-        public void ComplexCommand()
-        {
-            this._teamSQLRepository.GetTeamByUserId();
         }
 
         public List<Team> GetWithSQL()
