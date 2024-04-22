@@ -163,6 +163,9 @@ CREATE TABLE Reservations (
     lodgerCount integer,
     userId varchar(255),
     calendarId varchar(255),
+    notes varchar(6000),
+	CreatedAt datetime NULL,
+    ApprovedAt datetime NULL,
     CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
     CONSTRAINT fk_reservations_calendarId FOREIGN KEY (calendarId) REFERENCES calendars(id)
 );

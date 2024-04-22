@@ -33,7 +33,7 @@ namespace dogsitting_backend.Controllers
         //    string json = JsonConvert.SerializeObject(teams);
 
         //    return Ok(json);
-        //}
+        
 
         //[HttpGet(Name ="Team")]
         [HttpGet]

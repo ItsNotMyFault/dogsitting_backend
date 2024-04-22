@@ -79,7 +79,6 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<IEnumerable<Reservation>> GetReservationsByUserId(string userId)
         {
-            userId = "e0b2801d-f67c-11ee-a26a-00155dd4f39d";
             return await this.ReservationSQLRepository.GetReservationsByUserIdAsync(Guid.Parse(userId));
 
         }

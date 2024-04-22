@@ -6,22 +6,44 @@ using Microsoft.AspNetCore.Mvc;
 using dogsitting_backend.Domain;
 using Google.Protobuf.WellKnownTypes;
 using dogsitting_backend.ApplicationServices;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using dogsitting_backend.Domain.auth;
+using ZstdSharp;
 
 namespace dogsitting_backend.Controllers
 {
-    [AllowAnonymous]
+
     public class AuthenticationController : ControllerBase
     {
         private readonly ClaimsPrincipal claimsPrincipal;
         private UserService userService;
+        private AuthUser authUser;
 
-        public AuthenticationController(IHttpContextAccessor httpContextAccessor, UserService userService)
+        public AuthenticationController(IHttpContextAccessor httpContextAccessor, UserService userService, UserManager<AuthUser> userManager)
         {
             this.claimsPrincipal = httpContextAccessor.HttpContext.User;
+            authUser = userManager.GetUserAsync(claimsPrincipal).Result;
             this.userService = userService;
 
         }
 
+        [HttpGet("user")]
+        [AllowAnonymous]
+        public IActionResult GetLoggedInUser()
+        {
+            if(this.authUser == null)
+            {
+                throw new Exception("not authentified");
+            }
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+
+            string json = JsonConvert.SerializeObject(this.authUser.ApplicationUser, settings);
+            return Ok(json);
+        }
 
 
         [HttpGet("login")]

@@ -22,6 +22,7 @@ public class ApplicationUser
     public string LastName { get; set; }
 
     public string Email { get; set; }
+    public string? PhoneNumber { get; set; }
     public string Name { get => this.FirstName + " " + this.LastName; }
 
     [Newtonsoft.Json.JsonIgnore]

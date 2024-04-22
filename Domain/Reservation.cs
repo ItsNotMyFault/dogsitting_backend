@@ -33,7 +33,8 @@ namespace dogsitting_backend.Domain
         public Guid CalendarId { get; set; }
 
         public int LodgerCount { get; set; } = 1;
-        public string ReservationTitle{ get => $"{this.Client.Name} ({this.LodgerCount})"; }
+        public string ReservationCalendarTitle{ get => $"{this.Client.Name} ({this.LodgerCount})"; }
+        public string ReservationTitle { get => $"{this.Client.Name}"; }
 
         public Reservation() { }
 
