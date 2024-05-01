@@ -35,6 +35,11 @@ namespace dogsitting_backend.Infrastructure
             return this.context.Teams.FirstAsync(team => team.NormalizedName == teamName);
         }
 
+        public Task<List<Team>> GetUserTeams(Guid userId)
+        {
+            return this.context.Teams.Include(t => t.Admins).Where(team => team.Admins.Any(admin => admin.Id == userId)).ToListAsync();
+        }
+
         public async Task<Object> Create(Team team)
         {
             this.context.Teams.Add(team);

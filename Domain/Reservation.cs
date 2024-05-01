@@ -27,13 +27,13 @@ namespace dogsitting_backend.Domain
         public Guid UserId { get; set; }
         public virtual ApplicationUser Client { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
+        
         public virtual Calendar Calendar { get; set; }
 
         public Guid CalendarId { get; set; }
 
         public int LodgerCount { get; set; } = 1;
-        public string ReservationCalendarTitle{ get => $"{this.Client.Name} ({this.LodgerCount})"; }
+        public string ReservationCalendarTitle{ get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client.Name}"; }
 
         public Reservation() { }

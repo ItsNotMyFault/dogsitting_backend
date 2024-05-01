@@ -14,14 +14,14 @@ namespace dogsitting_backend.ApplicationServices
         private readonly IGenericRepository<Team> _teamGenericRepository;
         private readonly TeamSQLRepository _teamSQLRepository;
         private readonly UserManager<AuthUser> _userManager;
-        private readonly UserService _userService;
+        private readonly AuthService _userService;
 
         public TeamService(
             IGenericRepository<Team> teamGenereicRepository,
             TeamSQLRepository teamSQLRepository,
             IHttpContextAccessor httpContextAccessor,
             UserManager<AuthUser> userManager,
-             UserService userService
+             AuthService userService
             )
         {
             _teamGenericRepository = teamGenereicRepository;
@@ -42,10 +42,14 @@ namespace dogsitting_backend.ApplicationServices
             return await _teamSQLRepository.GetTeamByNormalizedName(teamNormalizedName);
         }
 
+        public async Task<List<Team>> GetUserTeams(Guid userId)
+        {
+            return await _teamSQLRepository.GetUserTeams(userId);
+        }
+
         public async Task<IEnumerable<Team>> GetTeamsWithAdmins()
         {
             return await _teamSQLRepository.GetAllTeamsAsync();
-            //return await _teamSQLRepository.GetAllTeamsAsync();
         }
 
         public async Task<Team> PostTeamAsync(Team team)
@@ -53,19 +57,21 @@ namespace dogsitting_backend.ApplicationServices
             //get logged in user, check if he is already mapped to a team, if yes boom.
             //if not accept creation.
             AuthUser user = this._userService.GetCurrentUserAsync().Result;
-            Team foundTeam = null;
-            try
-            {
-                foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
-            }
-            catch (Exception ex)
-            {
-                var e = ex;
-            }
+
+            Team foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
             if (foundTeam != null)
             {
                 throw new Exception("This user already has a team assigned to it.");
             }
+
+
+            foundTeam = this._teamSQLRepository.GetTeamByNormalizedName(team.NormalizedName).Result;
+
+            if (foundTeam != null)
+            {
+                throw new Exception("This team name is taken");
+            }
+
 
             team.NormalizeTeamName();
             team.Admins.Add(user.ApplicationUser);

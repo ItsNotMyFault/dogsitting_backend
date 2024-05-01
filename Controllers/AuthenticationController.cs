@@ -17,10 +17,10 @@ namespace dogsitting_backend.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly ClaimsPrincipal claimsPrincipal;
-        private UserService userService;
+        private AuthService userService;
         private AuthUser authUser;
 
-        public AuthenticationController(IHttpContextAccessor httpContextAccessor, UserService userService, UserManager<AuthUser> userManager)
+        public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService userService, UserManager<AuthUser> userManager)
         {
             this.claimsPrincipal = httpContextAccessor.HttpContext.User;
             authUser = userManager.GetUserAsync(claimsPrincipal).Result;
@@ -28,7 +28,7 @@ namespace dogsitting_backend.Controllers
 
         }
 
-        [HttpGet("user")]
+        [HttpGet("authuser")]
         [AllowAnonymous]
         public IActionResult GetLoggedInUser()
         {

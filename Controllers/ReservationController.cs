@@ -23,11 +23,16 @@ namespace dogsitting_backend.Controllers
         }
 
 
-        [HttpGet(Name = "Reservation")]
-        public async Task<ActionResult> Get()
+        [HttpGet(Name = "UserReservations")]
+        [HttpGet("User/{id}")]
+        public async Task<ActionResult> GetUserReservations([FromRoute] Guid id)
         {
-            List<Reservation> reservations = (await this.ReservationService.GetReservationsByUserId(this._authUser.ApplicationUser.Id.ToString())).ToList();
-   
+            if (!ModelState.IsValid)
+            {
+                return BadRequest($"Error forming request getting reservations of user {id}");
+            }
+            List<Reservation> reservations = (await this.ReservationService.GetReservationsByUserId(id)).ToList();
+
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -37,10 +42,28 @@ namespace dogsitting_backend.Controllers
         }
 
 
-
-        [HttpPost(Name = "PostReservation")]
-        public async Task<ActionResult> Post(Reservation reservation)
+        [HttpGet("Team/{teamName}")]
+        public async Task<ActionResult> GetTeamReservations([FromRoute] string teamName)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest($"Error forming request getting reservations of team {teamName}");
+            }
+            List<TeamReservationResponse> reservations = (await this.ReservationService.GetReservationsByTeamName(teamName)).ToList();
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(reservations, settings);
+            return Ok(json);
+        }
+
+
+        [HttpPost("{team}", Name = "PostReservation")]
+        public async Task<ActionResult> Post([FromBody] Reservation reservation, string team)
+        {
+            await this.ReservationService.Create(reservation, team);
             //create a reservation for current logged in user.
             return Ok();
         }

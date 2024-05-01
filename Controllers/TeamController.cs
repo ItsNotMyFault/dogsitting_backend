@@ -33,7 +33,7 @@ namespace dogsitting_backend.Controllers
         //    string json = JsonConvert.SerializeObject(teams);
 
         //    return Ok(json);
-        
+
 
         //[HttpGet(Name ="Team")]
         [HttpGet]
@@ -46,9 +46,19 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
+        [HttpGet("user/{UserId}")]
+        [AllowAnonymous]
+        public ActionResult GetUserTeams([FromRoute] Guid UserId)
+        {
+            List<Team> teams = this.teamService.GetUserTeams(UserId).Result.ToList();
+            string json = JsonConvert.SerializeObject(teams);
+
+            return Ok(json);
+        }
+
         [HttpGet("{teamNormalizedName}")]
         [AllowAnonymous]
-        public async Task<ActionResult> GetTeamByNormalizedName([FromRoute]string teamNormalizedName)
+        public async Task<ActionResult> GetTeamByNormalizedName([FromRoute] string teamNormalizedName)
         {
             Team team = await this.teamService.GetTeamByNormalizedName(teamNormalizedName);
             string json = JsonConvert.SerializeObject(team);
@@ -59,9 +69,10 @@ namespace dogsitting_backend.Controllers
         [HttpPost]
         [Authorize(Policy = "PolicyAdmin")]
         [Route("create")]
-        public async Task<ActionResult> Post([FromBody] Team team)
+        public async Task<ActionResult> Create([FromBody] Team team)
         {
             await this.teamService.PostTeamAsync(team);
+
             return Ok(JsonConvert.SerializeObject(team));
         }
     }

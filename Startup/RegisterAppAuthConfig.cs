@@ -50,7 +50,7 @@ namespace dogsitting_backend.Startup
                         string serializedAccessToken = JsonConvert.SerializeObject(tokenResponse);
                         context.HttpContext.Session.SetString("facebook_accesstoken", serializedAccessToken);
                         ClaimsIdentity claimsIdentity = context.Principal.Identity as ClaimsIdentity;
-                        UserService authenticationService = context.HttpContext.RequestServices.GetRequiredService(typeof(UserService)) as UserService;
+                        AuthService authenticationService = context.HttpContext.RequestServices.GetRequiredService(typeof(AuthService)) as AuthService;
 
                         bool isSuccess = await authenticationService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
                         await Task.CompletedTask;

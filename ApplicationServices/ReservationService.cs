@@ -1,9 +1,15 @@
 ﻿using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MySql.Data.MySqlClient;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities.IO;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -14,85 +20,69 @@ namespace dogsitting_backend.ApplicationServices
         private readonly IGenericRepository<Reservation> _genericRepository;
         private readonly IGenericRepository<Calendar> _calendarGenereicRepository;
         private readonly ReservationSQLRepository ReservationSQLRepository;
+        private readonly AuthService _userService;
+        private readonly CalendarService _calendarService;
+        private readonly TeamService _teamService;
 
         public ReservationService() { }
-        public ReservationService(IGenericRepository<Reservation> genereicRepository, IGenericRepository<Calendar> calendarGenereicRepository, ReservationSQLRepository reservationSQLRepository)
+        public ReservationService(
+            AuthService userService,
+            CalendarService calendarService,
+            TeamService teamService,
+            IGenericRepository<Reservation> genereicRepository,
+            IGenericRepository<Calendar> calendarGenereicRepository,
+            ReservationSQLRepository reservationSQLRepository
+        )
         {
+
+            this._calendarService = calendarService;
+            this._userService = userService;
+            this._teamService = teamService;
             this._genericRepository = genereicRepository;
             this._calendarGenereicRepository = calendarGenereicRepository;
             this.ReservationSQLRepository = reservationSQLRepository;
         }
 
-        /// <summary>
-        /// Get a Team's calendar with all it's corresponding reservations
-        /// </summary>
-        /// <param name="param"></param>
-        /// <returns></returns>
-        public async Task<Calendar> GetTeamCalendar(string param)
+        public async Task<IEnumerable<Reservation>> GetReservationsByUserId(Guid userId)
         {
-            List<Calendar> calendars = this._calendarGenereicRepository.Build()
-            .Include(calendar => calendar.Team)
-            .ThenInclude(team => team.Admins)
-            .Include(calendar => calendar.Reservations)
-            .ThenInclude(reservation => reservation.Client).ToList();
-            Calendar testCalendar = calendars.First();
-            return testCalendar;
-        }
-
-        public async Task<List<Calendar>> GetAllCalendars()
-        {
-            List<Calendar> calendars = this._calendarGenereicRepository.Build()
-            .Include(calendar => calendar.Team)
-            .ThenInclude(team => team.Admins)
-            .Include(calendar => calendar.Reservations)
-            .ThenInclude(reservation => reservation.Client).ToList();
-            return calendars;
-        }
-
-        public async Task<List<BusyCalendarEvent>> GetCalendarBusyEvents(string team)
-        {
-            Calendar calendar = await this.GetTeamCalendar(team);
-            List<BusyCalendarEvent> events = calendar.GetBusyEvents();
-            return events;
+            return await this.ReservationSQLRepository.GetReservationsByUserIdAsync(userId);
 
         }
 
-        public async Task<List<CalendarEvent>> GetCalendarArrivalEvents(string team)
+        public async Task<IEnumerable<TeamReservationResponse>> GetReservationsByTeamName(string teamName)
         {
-            Calendar calendar = await this.GetTeamCalendar(team);
-            List<CalendarEvent> events = calendar.GetArrivalEvents();
-            return events;
-        }
+            Team team = await this._teamService.GetTeamByNormalizedName(teamName);
+            List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByTeamIdAsync(team.Id);
 
-        public async Task<List<CalendarEvent>> GetCalendarDepartureEvents(string team)
-        {
-            Calendar calendar = await this.GetTeamCalendar(team);
-            List<CalendarEvent> events = calendar.GetDepartureEvents();
-            return events;
-        }
-
-        //OPTIONS
-
-        //itérer sur tous les journées CalendarEvent et faire le +X selon le lodgerCount.
-        //ça implique de supprimer les événements en double.
-
-
-        public async Task<IEnumerable<Reservation>> GetReservationsByUserId(string userId)
-        {
-            return await this.ReservationSQLRepository.GetReservationsByUserIdAsync(Guid.Parse(userId));
+            List<TeamReservationResponse> teamReservations = reservations.Select(reservation => new TeamReservationResponse(reservation)).ToList();
+            return teamReservations;
 
         }
 
 
-        public void CreateReservation()
+        public async Task Create(Reservation reservation, string teamName)
         {
+            //reservation.Id = Guid.NewGuid();
+            AuthUser user = this._userService.GetCurrentUserAsync().Result;
+            if (reservation.Client.Id != user.ApplicationUser.Id)
+            {
+                throw new Exception("Cannot create a reservation for another user than yourself.");
+            }
+            reservation.UserId = user.ApplicationUser.Id;
+            reservation.Client = null;
+
+            Team team = await this._teamService.GetTeamByNormalizedName(teamName);
+
+            Calendar calendar = await this._calendarService.GetTeamCalendar(teamName);
+            calendar.TeamId = team.Id;
+            reservation.CalendarId = calendar.Id;
+            
+            await this.ReservationSQLRepository.Create(reservation);
             //check current logged in User.
             //get his team => get his calendar
 
             //Validate calendar is available on desired period.
             //  IF NOT propose another team WHO IS. => check other teams.
-
-
         }
 
 

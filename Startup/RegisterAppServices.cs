@@ -9,7 +9,9 @@ namespace dogsitting_backend.Startup
             
             services.AddTransient<TeamService>();
             services.AddTransient<ReservationService>();
-            services.AddTransient<UserService>();
+            services.AddTransient<AuthService>();
+            services.AddTransient<ApplicationUserService>();
+            services.AddTransient<CalendarService>();
 
         }
     }

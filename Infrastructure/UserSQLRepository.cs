@@ -2,6 +2,7 @@
 using dogsitting_backend.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Tls;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,6 +44,30 @@ namespace dogsitting_backend.Infrastructure
             await this.context.SaveChangesAsync();
             return user;
         }
+
+        public async Task<Object> Update(ApplicationUser user)
+        {
+            this.context.Users.Update(user);
+            await this.context.SaveChangesAsync();
+            return user;
+        }
+
+        public async Task Delete(Guid id)
+        {
+            var applicationUser = await this.context.Users.FindAsync(id);
+            if (applicationUser != null)
+            {
+                this.context.Users.Remove(applicationUser);
+            }
+
+            await this.context.SaveChangesAsync();
+        }
+
+        private bool ApplicationUserExists(Guid id)
+        {
+            return this.context.Users.Any(e => e.Id == id);
+        }
+
 
 
     }

@@ -18,9 +18,11 @@ namespace dogsitting_backend.Controllers
     public class CalendarController : ControllerBase
     {
         private ReservationService ReservationService;
-        public CalendarController(ReservationService reservationService, IHttpContextAccessor httpContextAccessor)
+        private CalendarService calendarService;
+        public CalendarController(ReservationService reservationService, CalendarService calendarService, IHttpContextAccessor httpContextAccessor)
         {
             this.ReservationService = reservationService;
+            this.calendarService = calendarService;
             var claimsPrincipal = httpContextAccessor.HttpContext.User;
         }
 
@@ -30,8 +32,8 @@ namespace dogsitting_backend.Controllers
         [Route("team/{team}/arrivaldepartures")]
         public async Task<ActionResult> GetArrivalDepartures([FromRoute] string team)
         {
-            List<CalendarEvent> departureEvents = await this.ReservationService.GetCalendarDepartureEvents(team);
-            List<CalendarEvent> arrivalEvents = await this.ReservationService.GetCalendarArrivalEvents(team);
+            List<CalendarEvent> departureEvents = await this.calendarService.GetCalendarDepartureEvents(team);
+            List<CalendarEvent> arrivalEvents = await this.calendarService.GetCalendarArrivalEvents(team);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -54,7 +56,7 @@ namespace dogsitting_backend.Controllers
 
             //param mode busy-available /  mode departure events / mode list reservations (default).
 
-            List<BusyCalendarEvent> events = await this.ReservationService.GetCalendarBusyEvents(team);
+            List<BusyCalendarEvent> events = await this.calendarService.GetCalendarBusyEvents(team);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore

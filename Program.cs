@@ -1,10 +1,13 @@
 using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Infrastructure;
 using dogsitting_backend.Startup;
+using dogsitting_backend.Startup.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,11 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 builder.Services.AddControllers();
+//builder.Services.AddControllers().AddJsonOptions(options =>
+//{
+//    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+//    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+//}); 
 
 
 IConfigurationRoot Configuration = builder.Configuration;
@@ -87,8 +95,16 @@ services.AddCors(options =>
 
 builder.Services.AddDbContext<DogsittingDBContext>(options =>
 {
-    string connetionString = builder.Configuration.GetSection("ConnectionString:Dev:dogsitting").Value;
-    options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
+    try
+    {
+        string connetionString = builder.Configuration.GetSection("ConnectionString:Dev:dogsitting").Value;
+        options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
+    }
+    catch(Exception err)
+    {
+        var ex = err;
+    }
+    
 }
 );
 
@@ -132,6 +148,8 @@ app.UseDeveloperExceptionPage();
 app.UseCors("VueCorsPolicy");
 app.UseHttpsRedirection();
 app.UseCookiePolicy();
+
+app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

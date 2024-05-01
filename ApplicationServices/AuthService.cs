@@ -14,12 +14,12 @@ using System.Threading.Tasks;
 
 namespace dogsitting_backend.ApplicationServices
 {
-    public class UserService
+    public class AuthService
     {
         private readonly UserManager<AuthUser> _userManager;
         private readonly SignInManager<AuthUser> _signInManager;
         private readonly ClaimsPrincipal claimsPrincipal;
-        public UserService(
+        public AuthService(
             UserManager<AuthUser> userManager, 
             SignInManager<AuthUser> signInManager, 
             IHttpContextAccessor httpContextAccessor
