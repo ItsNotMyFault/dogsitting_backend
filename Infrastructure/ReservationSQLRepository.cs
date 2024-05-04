@@ -17,6 +17,13 @@ namespace dogsitting_backend.Infrastructure
             this.context = context;
         }
 
+        public async Task<Reservation> FindById(Guid Id)
+        {
+            return await this.context.Reservations.Where(reservation => reservation.Id == Id).FirstAsync();
+        }
+
+
+
         public async Task<List<Reservation>> GetAllReservationsAsync()
         {
             return await this.context.Reservations.Include("Team").ToListAsync();
@@ -42,6 +49,13 @@ namespace dogsitting_backend.Infrastructure
         public async Task<Object> Create(Reservation reservation)
         {
             this.context.Reservations.Add(reservation);
+            await this.context.SaveChangesAsync();
+            return reservation;
+        }
+
+        public async Task<Object> Delete(Reservation reservation)
+        {
+            this.context.Reservations.Remove(reservation);
             await this.context.SaveChangesAsync();
             return reservation;
         }

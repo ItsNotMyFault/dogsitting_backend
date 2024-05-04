@@ -22,9 +22,7 @@ namespace dogsitting_backend.Controllers
             this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
         }
 
-
-        [HttpGet(Name = "UserReservations")]
-        [HttpGet("User/{id}")]
+        [HttpGet("User/{id}", Name = "UserReservations")]
         public async Task<ActionResult> GetUserReservations([FromRoute] Guid id)
         {
             if (!ModelState.IsValid)
@@ -64,6 +62,14 @@ namespace dogsitting_backend.Controllers
         public async Task<ActionResult> Post([FromBody] Reservation reservation, string team)
         {
             await this.ReservationService.Create(reservation, team);
+            //create a reservation for current logged in user.
+            return Ok();
+        }
+
+        [HttpDelete("{Id}", Name = "DeleteReservation")]
+        public async Task<ActionResult> Delete([FromRoute] Guid Id)
+        {
+            await this.ReservationService.Delete(Id);
             //create a reservation for current logged in user.
             return Ok();
         }

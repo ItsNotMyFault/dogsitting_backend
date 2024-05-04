@@ -35,7 +35,7 @@ namespace dogsitting_backend.Domain
 
         public int LodgerCount { get; set; } = 1;
         public string ReservationCalendarTitle{ get => $"{this.Client?.Name} ({this.LodgerCount})"; }
-        public string ReservationTitle { get => $"{this.Client.Name}"; }
+        public string ReservationTitle { get => $"{this.Client?.Name}"; }
 
         public Reservation() { }
 
@@ -58,7 +58,7 @@ namespace dogsitting_backend.Domain
 
         public CalendarEvent GetDateRangeEvent()
         {
-            return new CalendarEvent(this.Period, this.ReservationCalendarTitle);
+            return new CalendarEvent(this.Id, this.Period, this.ReservationCalendarTitle);
         }
     }
 }

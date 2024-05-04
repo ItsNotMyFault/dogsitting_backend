@@ -85,6 +85,12 @@ namespace dogsitting_backend.ApplicationServices
             //  IF NOT propose another team WHO IS. => check other teams.
         }
 
+        public async Task Delete(Guid Id)
+        {
+            Reservation reservation = await this.ReservationSQLRepository.FindById(Id);
+            await this.ReservationSQLRepository.Delete(reservation);
+        }
+
 
     }
 }
