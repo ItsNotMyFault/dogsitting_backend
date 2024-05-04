@@ -65,6 +65,21 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
 
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("team/{team}/reservationevents")]
+        public async Task<ActionResult> GetReservationsEvents([FromRoute] string team)
+        {
+            List<CalendarEvent> events = await this.calendarService.GetReservationEvents(team);
+            JsonSerializerSettings settings = new()
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            string json = JsonConvert.SerializeObject(events, settings);
+            return Ok(json);
+
+        }
         //
     }
 }

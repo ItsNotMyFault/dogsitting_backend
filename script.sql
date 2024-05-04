@@ -86,6 +86,9 @@ select * from Users;
 select * from Users inner join UserLogins on userLogins.UserId = users.id;
 select * from UserLogins;
 select * from Roles;
+select * from Reservations;
+
+select * from teamUsers;
 
 CREATE TABLE UserTokens (
     UserId varchar(255) not null,
@@ -177,6 +180,9 @@ select * from teams where id = "2e731e68-f682-11ee-a26a-00155dd4f30d";
 
 #SET SQL_SAFE_UPDATES = 0;
 delete from reservations where id is not null;
+
+
+select * from users where id = "e0b2801d-f67c-11ee-a26a-00155dd4f30d";
 
 
 

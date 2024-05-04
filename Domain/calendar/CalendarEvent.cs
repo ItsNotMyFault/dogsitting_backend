@@ -25,11 +25,12 @@ namespace dogsitting_backend.Domain.calendar
             SetIsPeriodAllDay();
         }
 
-        public CalendarEvent(DateTimePeriod DateTimePeriod, FreeBusyStatus EventStatus)
+        public CalendarEvent(DateTimePeriod DateTimePeriod, string eventSubject)
         {
+            this.EventSubject = eventSubject;
+            this.IsAllDayEvent = true;
             this.DateTimePeriod = DateTimePeriod;
             Id = Guid.NewGuid();
-            SetIsPeriodAllDay();
         }
 
         private void SetIsPeriodAllDay()

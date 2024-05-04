@@ -22,15 +22,26 @@ namespace dogsitting_backend.ApplicationServices
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public async Task<Calendar> GetTeamCalendar(string param)
+        public async Task<Calendar> GetTeamCalendar(string team)
         {
-            List<Calendar> calendars = this._calendarGenereicRepository.Build()
+            //todo optimize this.
+            //List<Calendar> calendars = this._calendarGenereicRepository.Build()
+            //.Include(calendar => calendar.Team)
+            //.ThenInclude(team => team.Admins)
+            //.Include(calendar => calendar.Reservations)
+            //.ThenInclude(reservation => reservation.Client).ToList();
+
+
+            Calendar calendar = this._calendarGenereicRepository.Build()
             .Include(calendar => calendar.Team)
             .ThenInclude(team => team.Admins)
             .Include(calendar => calendar.Reservations)
-            .ThenInclude(reservation => reservation.Client).ToList();
-            Calendar testCalendar = calendars.First();
-            return testCalendar;
+            .ThenInclude(reservation => reservation.Client)
+            .Where(c => c.Team.NormalizedName == team).First();
+
+            //Calendar testCalendar = calendars.First();
+            //return testCalendar;
+            return calendar;
         }
 
         public async Task<List<Calendar>> GetAllCalendars()
@@ -43,12 +54,17 @@ namespace dogsitting_backend.ApplicationServices
             return calendars;
         }
 
+        public async Task<List<CalendarEvent>> GetReservationEvents(string team)
+        {
+            Calendar calendar = await this.GetTeamCalendar(team);
+            return calendar.GetReservationsEvents();
+        }
+
         public async Task<List<BusyCalendarEvent>> GetCalendarBusyEvents(string team)
         {
             Calendar calendar = await this.GetTeamCalendar(team);
             List<BusyCalendarEvent> events = calendar.GetBusyEvents();
             return events;
-
         }
 
         public async Task<List<CalendarEvent>> GetCalendarArrivalEvents(string team)

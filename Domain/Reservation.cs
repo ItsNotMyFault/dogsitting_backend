@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using dogsitting_backend.Domain.calendar;
 
@@ -44,24 +45,20 @@ namespace dogsitting_backend.Domain
             this.Client = client;
         }
 
-        //list all events (admin) to see all dogos
 
-
-        public List<CalendarEvent> GetEvents()
+        public List<CalendarEvent> GetDailyEvents()
         {
-            //get events for client mode.
-
-            //get busy status for client mode.
-
-            //
-            var dailyEvents = this.Calendar.GetDailyCalendarEvents();
             List<CalendarEvent> events = [];
             foreach (DateTime datetime in this.Period.EachDay())
             {
-                dailyEvents.Where(eve => eve.DateTimePeriod.StartDate.Equals(datetime)).ToList();
                 events.Add(new CalendarEvent(datetime));
             };
             return events;
+        }
+
+        public CalendarEvent GetDateRangeEvent()
+        {
+            return new CalendarEvent(this.Period, this.ReservationCalendarTitle);
         }
     }
 }

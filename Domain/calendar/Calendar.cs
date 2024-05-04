@@ -82,11 +82,11 @@ namespace dogsitting_backend.Domain.calendar
         public List<BusyCalendarEvent> GetBusyEvents()
         {
 
-            List<BusyCalendarEvent> BusyEvents = new List<BusyCalendarEvent>();
+            List<BusyCalendarEvent> BusyEvents = [];
 
             Reservations.ToList().ForEach(reservation =>
             {
-                reservation.GetEvents().ForEach(ev =>
+                reservation.GetDailyEvents().ForEach(ev =>
                 {
                     bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
                     {
@@ -110,6 +110,12 @@ namespace dogsitting_backend.Domain.calendar
             return BusyEvents;
             //create a list of fulltime day events with a condition on the calendar setting to determine
             //if each day is full / busy / free
+        }
+
+        public List<CalendarEvent> GetReservationsEvents()
+        {
+            List<CalendarEvent> reservationEvents = Reservations.Select(reservation => reservation.GetDateRangeEvent()).ToList();
+            return reservationEvents;
         }
 
     }
