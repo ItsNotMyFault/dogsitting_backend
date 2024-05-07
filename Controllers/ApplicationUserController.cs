@@ -3,11 +3,14 @@ using dogsitting_backend.Domain;
 using Microsoft.AspNetCore.Authorization;
 using dogsitting_backend.ApplicationServices;
 using Newtonsoft.Json;
+using dogsitting_backend.ApplicationServices.dto;
 
 namespace dogsitting_backend.Controllers
 {
-    [Authorize]
-    [Route("Users")]
+    //[Authorize]
+    [AllowAnonymous]
+    [ApiController]
+    [Route("users")]
     public class ApplicationUserController : Controller
     {
         private readonly ApplicationUserService _applicationUserService;
@@ -17,7 +20,6 @@ namespace dogsitting_backend.Controllers
             _applicationUserService = applicationUserService;
         }
 
-        // GET: ApplicationUser
         public ActionResult Index()
         {
             List<ApplicationUser> users = this._applicationUserService.Index().Result.ToList();
@@ -26,26 +28,21 @@ namespace dogsitting_backend.Controllers
             return Ok(users);
         }
 
-        // GET: ApplicationUser/Details/5
         [HttpGet("{id}")]
         public ActionResult Details([FromRoute] Guid id)
         {
-            ApplicationUser user = this._applicationUserService.Details(id).Result;
+            ApplicationUser user = this._applicationUserService.GetUserById(id).Result;
             string json = JsonConvert.SerializeObject(user);
 
             return Ok(json);
         }
 
-        [HttpPost("edit/{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task Edit([FromRoute] Guid id, [Bind("Id,FirstName,LastName,Email,PhoneNumber")] ApplicationUser applicationUser)
+        //the problem was validatetoken forgery wHY?
+        [HttpPut("edit/{id}")]
+        public async Task<IActionResult> Edit([FromRoute] Guid id, [FromBody] UpdateUserDto applicationUser)
         {
-            if (id != applicationUser.Id)
-            {
-                throw new ArgumentException("Wrong id");
-            }
-
             await this._applicationUserService.Edit(id, applicationUser);
+            return Ok();
         }
 
         [HttpDelete("delete")]

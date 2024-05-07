@@ -27,8 +27,6 @@ public class ApplicationUser
 
     [Newtonsoft.Json.JsonIgnore]
     public ICollection<Team> Teams { get; } = new List<Team>();
-    //public string Email { get; set; }
-    //public int Enable { get; set; }
     [Newtonsoft.Json.JsonIgnore]
     public virtual IList<Reservation> Reservations { get; set; }
     [Newtonsoft.Json.JsonIgnore]

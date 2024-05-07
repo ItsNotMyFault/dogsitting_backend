@@ -24,9 +24,9 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Teams.Include(t => t.Admins).ToListAsync();
         }
 
-        public async Task<Object> GetTeamById(Guid id)
+        public async Task<Team> GetTeamById(Guid id)
         {
-            return await this.context.Teams.FirstOrDefaultAsync(team => team.Id == id);
+            return await this.context.Teams.FindAsync(id);
             //return await this.context.Teams.Where(team => team.id == id).ToListAsync();
         }
 

@@ -100,8 +100,7 @@ CREATE TABLE UserTokens (
 );
 
 select * from teams;
-
-
+delete from teams where id  = '08dc5fb2-12c8-47d3-8453-934b4b0fb586';
 
 select * from users inner join TeamUsers on TeamUsers.userId = users.id where users.id = 'e0b2801d-f67c-11ee-a26a-00155dd4f30d';
 #give possibility to switch team from user interface, being in multiple teams.

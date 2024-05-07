@@ -1,20 +1,14 @@
 ﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain;
-using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Utilities.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mime;
-using System.Threading.Tasks;
 
 namespace dogsitting_backend.Controllers
 {
     [Authorize]
+    [ApiController]
     [Route("[controller]")]
     public class TeamController : ControllerBase
     {
@@ -25,17 +19,6 @@ namespace dogsitting_backend.Controllers
         }
 
 
-        //[HttpGet(Name = "GetTeam")]
-        //[AllowAnonymous]
-        //public ActionResult Get()
-        //{
-        //    List<Team> teams = this.teamService.GetTeamsInclude().Result.ToList();
-        //    string json = JsonConvert.SerializeObject(teams);
-
-        //    return Ok(json);
-
-
-        //[HttpGet(Name ="Team")]
         [HttpGet]
         [AllowAnonymous]
         public ActionResult GetTeams()
@@ -64,6 +47,25 @@ namespace dogsitting_backend.Controllers
             string json = JsonConvert.SerializeObject(team);
             return Ok(json);
         }
+
+
+
+        [HttpGet("id/{id}")]
+        public async Task<ActionResult> GetTeamById([FromRoute] Guid id)
+        {
+            Team team = await this.teamService.GetTeamById(id);
+            string json = JsonConvert.SerializeObject(team);
+            return Ok(json);
+        }
+
+
+        [HttpPut("edit/{id}")]
+        public async Task<IActionResult> Edit([FromRoute] Guid id, [FromBody] UpdateTeamDto teamDto)
+        {
+            await this.teamService.UpdateTeamAsync(id, teamDto);
+            return Ok();
+        }
+
 
 
         [HttpPost]

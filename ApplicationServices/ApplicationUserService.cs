@@ -1,4 +1,5 @@
-﻿using dogsitting_backend.Domain;
+﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain;
 using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +22,7 @@ namespace dogsitting_backend.ApplicationServices
         }
 
         // GET: ApplicationUser/Details/5
-        public async Task<ApplicationUser> Details(Guid id)
+        public async Task<ApplicationUser> GetUserById(Guid id)
         {
             if (id == null)
             {
@@ -37,8 +38,6 @@ namespace dogsitting_backend.ApplicationServices
             return applicationUser;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task Create([Bind("Id,FirstName,LastName,Email,PhoneNumber")] ApplicationUser applicationUser)
         {
             //if (ModelState.IsValid)
@@ -49,20 +48,19 @@ namespace dogsitting_backend.ApplicationServices
         }
 
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task Edit(Guid id, [Bind("Id,FirstName,LastName,Email,PhoneNumber")] ApplicationUser applicationUser)
+        public async Task Edit(Guid id, UpdateUserDto updateUserDto)
         {
-            if (id != applicationUser.Id)
-            {
-                throw new Exception("User not found");
-            }
 
+            var applicationUser = await this.GetUserById(id);
+
+            // Update user properties based on the DTO
+            applicationUser.FirstName = updateUserDto.FirstName;
+            applicationUser.LastName = updateUserDto.LastName;
+            applicationUser.Email = updateUserDto.Email;
+            applicationUser.PhoneNumber = updateUserDto.PhoneNumber;
             await this._userSQLRepository.Update(applicationUser);
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]//what does that do?
         public async Task Delete(Guid id)
         {
             await this._userSQLRepository.Delete(id);

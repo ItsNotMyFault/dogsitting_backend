@@ -1,4 +1,5 @@
-﻿using dogsitting_backend.Domain;
+﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -42,6 +43,11 @@ namespace dogsitting_backend.ApplicationServices
             return await _teamSQLRepository.GetTeamByNormalizedName(teamNormalizedName);
         }
 
+        public async Task<Team> GetTeamById(Guid id)
+        {
+            return await _teamSQLRepository.GetTeamById(id);
+        }
+
         public async Task<List<Team>> GetUserTeams(Guid userId)
         {
             return await _teamSQLRepository.GetUserTeams(userId);
@@ -64,7 +70,6 @@ namespace dogsitting_backend.ApplicationServices
                 throw new Exception("This user already has a team assigned to it.");
             }
 
-
             foundTeam = this._teamSQLRepository.GetTeamByNormalizedName(team.NormalizedName).Result;
 
             if (foundTeam != null)
@@ -72,11 +77,24 @@ namespace dogsitting_backend.ApplicationServices
                 throw new Exception("This team name is taken");
             }
 
-
             team.NormalizeTeamName();
             team.Admins.Add(user.ApplicationUser);
             await _teamGenericRepository.AddAsync(team);
             return team;
+        }
+
+        public async Task<Team> UpdateTeamAsync(Guid id, UpdateTeamDto team)
+        {
+            Team foundTeam = await this._teamSQLRepository.GetTeamById(id);
+            foundTeam.Name = team.Name;
+            foundTeam.NormalizedName = team.Name.ToLower();
+            if (foundTeam == null)
+            {
+                throw new Exception("No team found");
+            }
+
+            await _teamGenericRepository.UpdateAsync(foundTeam);
+            return foundTeam;
         }
 
         public List<Team> GetWithSQL()
