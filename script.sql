@@ -67,6 +67,13 @@ VALUES ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "aguay", "AGUAY", "alexis_raphae
  
  
 
+CREATE TABLE Availabilities (
+    Id varchar(255) PRIMARY KEY,
+    CalendarId varchar(255),
+    Date datetime NULL,
+	CONSTRAINT fk_calendars_CalendarId FOREIGN KEY (CalendarId) REFERENCES Calendars(id)
+);
+
 
  
 select * from Users;

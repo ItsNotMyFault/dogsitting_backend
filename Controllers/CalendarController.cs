@@ -1,15 +1,10 @@
 ﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.calendar;
-using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
-using Org.BouncyCastle.Utilities.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace dogsitting_backend.Controllers
 {
@@ -17,11 +12,9 @@ namespace dogsitting_backend.Controllers
     [Route("[controller]")]
     public class CalendarController : ControllerBase
     {
-        private ReservationService ReservationService;
         private CalendarService calendarService;
-        public CalendarController(ReservationService reservationService, CalendarService calendarService, IHttpContextAccessor httpContextAccessor)
+        public CalendarController(CalendarService calendarService, IHttpContextAccessor httpContextAccessor)
         {
-            this.ReservationService = reservationService;
             this.calendarService = calendarService;
             var claimsPrincipal = httpContextAccessor.HttpContext.User;
         }
@@ -52,10 +45,6 @@ namespace dogsitting_backend.Controllers
         [Route("team/{team}/busyevents")]
         public async Task<ActionResult> GetBusyEvents([FromRoute] string team)
         {
-            //param => mode client, mode admin (default selon le login)
-
-            //param mode busy-available /  mode departure events / mode list reservations (default).
-
             List<BusyCalendarEvent> events = await this.calendarService.GetCalendarBusyEvents(team);
             var settings = new JsonSerializerSettings
             {
@@ -63,7 +52,50 @@ namespace dogsitting_backend.Controllers
             };
             string json = JsonConvert.SerializeObject(events, settings);
             return Ok(json);
+        }
 
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("team/{team}/availableevents")]
+        public async Task<ActionResult> GetAvailableEvents([FromRoute] string team)
+        {
+            AvailabilitiesResponse availabilitiesResponse = await this.calendarService.GetCalendarAvailabilitiesEvents(team);
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
+            string json = JsonConvert.SerializeObject(availabilitiesResponse, settings);
+            return Ok(json);
+        }
+
+        //TODO
+        //lister les dates avec réservations (full ou busy)
+        //lister les dates disponibles
+        //lister les dates non disponibles.
+        //permettre à l'admin de retirer/ajouter des dates dispos ou non-dispos
+        //======================
+        //BusyEvetn (background color) pour des réservations avec calcul des lodgercount.
+        //availableEvent (background color) pour des availabilities
+        //ReservationEvent (labeled event) pour des réservations
+
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("team/{team}/availabilities")]
+        public async Task<ActionResult> AddAvailabilityEvents([FromRoute] string team, [FromBody] List<AvailabilityDto> dates)
+        {
+            await this.calendarService.AddAvailabilities(team, dates);
+            return Ok();
+        }
+
+        [HttpPut]
+        [AllowAnonymous]
+        [Route("team/{team}/availabilities")]
+        public async Task<ActionResult> DeleteAvailabilityEvents([FromRoute] string team, [FromBody] List<AvailabilityDto> dates)
+        {
+            await this.calendarService.DeleteAvailabilities(team, dates);
+            return Ok();
         }
 
         [HttpGet]
@@ -80,6 +112,6 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
 
         }
-        //
+
     }
 }

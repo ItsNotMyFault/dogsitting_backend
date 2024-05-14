@@ -24,7 +24,7 @@ namespace dogsitting_backend.ApplicationServices
         // GET: ApplicationUser/Details/5
         public async Task<ApplicationUser> GetUserById(Guid id)
         {
-            if (id == null)
+            if (id == Guid.Empty)
             {
                 throw new Exception("Id param is required");
             }
@@ -51,6 +51,10 @@ namespace dogsitting_backend.ApplicationServices
         public async Task Edit(Guid id, UpdateUserDto updateUserDto)
         {
 
+            if(updateUserDto == null)
+            {
+                throw new Exception("User profile parameters are null.");
+            }
             var applicationUser = await this.GetUserById(id);
 
             // Update user properties based on the DTO

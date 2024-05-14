@@ -29,7 +29,7 @@ namespace dogsitting_backend.Controllers
             {
                 return BadRequest($"Error forming request getting reservations of user {id}");
             }
-            List<Reservation> reservations = (await this.ReservationService.GetReservationsByUserId(id)).ToList();
+            List<ReservationResponse> reservations = (await this.ReservationService.GetReservationsByUserId(id)).ToList();
 
             var settings = new JsonSerializerSettings
             {
@@ -47,7 +47,7 @@ namespace dogsitting_backend.Controllers
             {
                 return BadRequest($"Error forming request getting reservations of team {teamName}");
             }
-            List<TeamReservationResponse> reservations = (await this.ReservationService.GetReservationsByTeamName(teamName)).ToList();
+            List<ReservationResponse> reservations = (await this.ReservationService.GetReservationsByTeamName(teamName)).ToList();
 
             var settings = new JsonSerializerSettings
             {

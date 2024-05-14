@@ -7,16 +7,30 @@ namespace dogsitting_backend.Domain.calendar
     [NotMapped]
     public class BusyCalendarEvent : CalendarEvent
     {
-        private Guid _id;
         public int LodgerCount { get; set; }
         public bool IsBusy { get; set; }
         public bool IsFree { get; set; }
         public bool IsFull { get; set; }
-        public BusyCalendarEvent(Reservation reservation, DateTime dateTime) : base(dateTime)
+        public BusyCalendarEvent(Reservation reservation, DateTime dateTime, bool isBusy = false) : base(dateTime)
         {
             Id = reservation.Id;
             LodgerCount = reservation.LodgerCount;
             EventSubject = reservation.ReservationTitle;
+            IsBusy = isBusy;
+        }
+
+        public BusyCalendarEvent(Availability availability) : base(availability.DateFrom)
+        {
+            this.DateTimePeriod = availability.Period;
+            if (availability.IsAvailable)
+            {
+                this.SetFree();
+            }
+            else
+            {
+                this.SetFull();
+            }
+
         }
 
         /// <summary>
@@ -27,6 +41,7 @@ namespace dogsitting_backend.Domain.calendar
         {
             LodgerCount += count;
             EventSubject = $"Occupé {LodgerCount}";
+            //TODO are availability events still busy calendar events?
 
         }
 

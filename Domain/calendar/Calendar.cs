@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,27 +17,27 @@ namespace dogsitting_backend.Domain.calendar
         public List<DateTimePeriod> UnavailablePeriods { get; set; }
         [NotMapped]
         public List<DateTimePeriod> AvailablePeriods { get; set; }
+        public List<CalendarEvent> DepartureEvents { get; set; } = new List<CalendarEvent>();
+        public List<CalendarEvent> ArrivalEvents { get; set; } = new List<CalendarEvent>();
 
         //[Newtonsoft.Json.JsonIgnore]
-        public virtual ICollection<Reservation> Reservations { get; set; }
+        public virtual ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
 
         [ForeignKey("Team")]
         public Guid TeamId { get; set; }
         public virtual Team Team { get; set; }
 
+        public Calendar() { }
+        public virtual ICollection<Availability> Availabilities { get; set; } = new List<Availability>();
+
         public bool UseAvailabilities { get; set; }
         public bool UseUnavailabilities { get; set; }
 
-        public int MaxWeekDaysLodgerCount = 1;
-        public int MaxWeekendDaysLodgerCount = 3;
+        public int MaxWeekDaysLodgerCount { get; set; }
+        public int MaxWeekendDaysLodgerCount { get; set; }
 
         private DateTimePeriod GeneralPeriod = new(DateTime.Now.AddMonths(-3), DateTime.Now.AddMonths(12));
 
-        public Calendar()
-        {
-
-            Reservations = [];
-        }
 
         public List<CalendarEvent> GetDailyCalendarEvents()
         {
@@ -54,7 +55,7 @@ namespace dogsitting_backend.Domain.calendar
             List<DateTime> arrivalDates = Reservations.Select(reservation => reservation.DateFrom).Distinct().ToList();
             foreach (Reservation reservation in Reservations.Where(r => arrivalDates.Contains(r.DateFrom)))
             {
-                ArrivalEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (arrival)"));
+                ArrivalEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (arrival)", reservation.Period));
             }
             return ArrivalEvents;
         }
@@ -66,7 +67,7 @@ namespace dogsitting_backend.Domain.calendar
 
             foreach (Reservation reservation in Reservations.Where(r => departureDates.Contains(r.DateTo)))
             {
-                DepartureEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (departure)"));
+                DepartureEvents.Add(new CalendarEvent($"{reservation.ReservationTitle} (departure)", reservation.Period));
             }
 
             return DepartureEvents;
@@ -75,16 +76,11 @@ namespace dogsitting_backend.Domain.calendar
 
 
 
-        public List<BusyCalendarEvent> BusyEvents { get; set; } = new List<BusyCalendarEvent>();
-        public List<CalendarEvent> DepartureEvents { get; set; } = new List<CalendarEvent>();
-        public List<CalendarEvent> ArrivalEvents { get; set; } = new List<CalendarEvent>();
-
-        public List<BusyCalendarEvent> GetBusyEvents()
+        public List<BusyCalendarEvent> GetComputedBusyEvents()
         {
-
             List<BusyCalendarEvent> BusyEvents = [];
 
-            Reservations.ToList().ForEach(reservation =>
+            this.Reservations.ToList().ForEach(reservation =>
             {
                 reservation.GetDailyEvents().ForEach(ev =>
                 {
@@ -106,15 +102,48 @@ namespace dogsitting_backend.Domain.calendar
                 });
             });
             BusyEvents.ForEach(ev => { ev.ComputeBusyness(this); });
-            this.BusyEvents = BusyEvents;
+
             return BusyEvents;
             //create a list of fulltime day events with a condition on the calendar setting to determine
             //if each day is full / busy / free
         }
 
+        public List<AvailableCalendarEvent> GetAvailableEvents()
+        {
+            List<AvailableCalendarEvent> AvailableEvents = [];
+            this.Availabilities.ToList().ForEach(availability =>
+            {
+                AvailableEvents.Add(new AvailableCalendarEvent(availability));
+            });
+            return AvailableEvents;
+        }
+
+        public List<BusyCalendarEvent> GetBusyEvents()
+        {
+
+            List<BusyCalendarEvent> BusyEvents = [];
+            this.Reservations.ToList().ForEach(reservation =>
+            {
+                reservation.GetDailyEvents().ForEach(ev =>
+                {
+                    bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
+                    {
+                        return ev.DateTimePeriod.IsPeriodOverlappedByPeriod(busyEve.DateTimePeriod);
+                    });
+                    if (!busyDayAlreadyExists)
+                    {
+                        //adds a new date as "busy"
+                        BusyEvents.Add(new BusyCalendarEvent(reservation, ev.DateTimePeriod.StartDate, true));
+                    }
+                });
+            });
+
+            return BusyEvents;
+        }
+
         public List<CalendarEvent> GetReservationsEvents()
         {
-            List<CalendarEvent> reservationEvents = Reservations.Select(reservation => reservation.GetDateRangeEvent()).ToList();
+            List<CalendarEvent> reservationEvents = this.Reservations.Select(reservation => reservation.GetReservationEvent()).ToList();
             return reservationEvents;
         }
 

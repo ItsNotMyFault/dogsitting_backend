@@ -6,5 +6,9 @@ namespace dogsitting_backend.ApplicationServices.dto
     {
         [Required]
         public string? Name { get; set; }
+        public bool UseAvailabilities { get; set; }
+        public bool UseUnavailabilities { get; set; }
+        public int MaxWeekDaysLodgerCount { get; set; }
+        public int MaxWeekendDaysLodgerCount { get; set; }
     }
 }

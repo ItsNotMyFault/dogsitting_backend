@@ -32,6 +32,7 @@ namespace dogsitting_backend.Controllers
         public ActionResult Details([FromRoute] Guid id)
         {
             ApplicationUser user = this._applicationUserService.GetUserById(id).Result;
+            //todo transform application user object to a response to avoid showing implicit data
             string json = JsonConvert.SerializeObject(user);
 
             return Ok(json);

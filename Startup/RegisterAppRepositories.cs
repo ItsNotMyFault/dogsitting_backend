@@ -10,6 +10,7 @@ namespace dogsitting_backend.Startup
         {
             
             services.AddTransient<TeamSQLRepository>();
+            services.AddTransient<CalendarSQLRepository>();
             services.AddTransient<ReservationSQLRepository>();
             services.AddTransient<UserSQLRepository>();
             services.AddTransient<RoleSQLRepository>();

@@ -24,7 +24,6 @@ namespace dogsitting_backend.ApplicationServices
         private readonly CalendarService _calendarService;
         private readonly TeamService _teamService;
 
-        public ReservationService() { }
         public ReservationService(
             AuthService userService,
             CalendarService calendarService,
@@ -43,31 +42,30 @@ namespace dogsitting_backend.ApplicationServices
             this.ReservationSQLRepository = reservationSQLRepository;
         }
 
-        public async Task<IEnumerable<Reservation>> GetReservationsByUserId(Guid userId)
+        public async Task<IEnumerable<ReservationResponse>> GetReservationsByUserId(Guid userId)
         {
-            return await this.ReservationSQLRepository.GetReservationsByUserIdAsync(userId);
+            List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByUserIdAsync(userId);
+            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderBy(t => t.DateFrom);
 
         }
 
-        public async Task<IEnumerable<TeamReservationResponse>> GetReservationsByTeamName(string teamName)
+        public async Task<IEnumerable<ReservationResponse>> GetReservationsByTeamName(string teamName)
         {
             Team team = await this._teamService.GetTeamByNormalizedName(teamName);
             List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByTeamIdAsync(team.Id);
-
-            List<TeamReservationResponse> teamReservations = reservations.Select(reservation => new TeamReservationResponse(reservation)).ToList();
-            return teamReservations;
+            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderBy(t => t.DateFrom);
 
         }
 
 
         public async Task Create(Reservation reservation, string teamName)
         {
-            //reservation.Id = Guid.NewGuid();
             AuthUser user = this._userService.GetCurrentUserAsync().Result;
             if (reservation.Client.Id != user.ApplicationUser.Id)
             {
                 throw new Exception("Cannot create a reservation for another user than yourself.");
             }
+            reservation.CreatedAt = DateTime.Now;
             reservation.UserId = user.ApplicationUser.Id;
             reservation.Client = null;
 
@@ -78,9 +76,7 @@ namespace dogsitting_backend.ApplicationServices
             reservation.CalendarId = calendar.Id;
             
             await this.ReservationSQLRepository.Create(reservation);
-            //check current logged in User.
-            //get his team => get his calendar
-
+            //TODO
             //Validate calendar is available on desired period.
             //  IF NOT propose another team WHO IS. => check other teams.
         }

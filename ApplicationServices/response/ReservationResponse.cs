@@ -4,7 +4,7 @@ using dogsitting_backend.Domain.calendar;
 
 namespace dogsitting_backend.Domain
 {
-    public class TeamReservationResponse
+    public class ReservationResponse
     {
 
         // Define backing fields for DateFrom and DateTo
@@ -18,7 +18,7 @@ namespace dogsitting_backend.Domain
         public string ReservationCalendarTitle { get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client.Name}"; }
 
-        public TeamReservationResponse(Reservation reservation)
+        public ReservationResponse(Reservation reservation)
         {
             this.DateFrom = reservation.DateFrom;
             this.DateTo = reservation.DateTo;

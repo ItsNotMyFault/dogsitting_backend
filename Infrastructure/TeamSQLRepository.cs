@@ -26,7 +26,7 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<Team> GetTeamById(Guid id)
         {
-            return await this.context.Teams.FindAsync(id);
+            return await this.context.Teams.Include(team => team.Admins).Include(team => team.Calendar).FirstAsync(t => t.Id == id);
             //return await this.context.Teams.Where(team => team.id == id).ToListAsync();
         }
 

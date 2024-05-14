@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.Domain.calendar;
+using dogsitting_backend.Domain.Utils;
 
 namespace dogsitting_backend.Domain
 {
@@ -27,7 +28,7 @@ namespace dogsitting_backend.Domain
 
         public void NormalizeTeamName()
         {
-            this.NormalizedName = this.Name.ToLower().Trim().Replace(" ", ".");
+            this.NormalizedName = StringUtils.ToKebabCase(this.Name);
         }
 
     }

@@ -7,15 +7,15 @@ namespace dogsitting_backend.Domain.calendar
     public class CalendarEvent
     {
         public Guid Id { get; set; }
-        public Guid ReservationId { get; set; }
         public DateTimePeriod DateTimePeriod { get; set; }
 
         public string EventSubject { get; set; }
         public string EventLocation { get; set; }
         public bool IsAllDayEvent { get; set; }
-        public CalendarEvent(string eventSubject)
+        public CalendarEvent(string eventSubject, DateTimePeriod period)
         {
             EventSubject = eventSubject;
+            this.DateTimePeriod = period;
             Id = Guid.NewGuid();
         }
 
@@ -26,14 +26,13 @@ namespace dogsitting_backend.Domain.calendar
             SetIsPeriodAllDay();
         }
 
-        public CalendarEvent(Guid reservationId, DateTimePeriod DateTimePeriod, string eventSubject)
+        public CalendarEvent(DateTimePeriod period)
         {
-            this.EventSubject = eventSubject;
-            this.IsAllDayEvent = true;
-            this.DateTimePeriod = DateTimePeriod;
-            this.ReservationId = reservationId;
-            this.Id = Guid.NewGuid();
+            DateTimePeriod = period;
+            Id = Guid.NewGuid();
+            SetIsPeriodAllDay();
         }
+
 
         private void SetIsPeriodAllDay()
         {

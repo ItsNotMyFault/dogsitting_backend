@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.ApplicationServices.response;
 using dogsitting_backend.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet("id/{id}")]
         public async Task<ActionResult> GetTeamById([FromRoute] Guid id)
         {
-            Team team = await this.teamService.GetTeamById(id);
+            TeamResponse team = await this.teamService.GetTeamById(id);
             string json = JsonConvert.SerializeObject(team);
             return Ok(json);
         }
@@ -73,7 +74,7 @@ namespace dogsitting_backend.Controllers
         [Route("create")]
         public async Task<ActionResult> Create([FromBody] Team team)
         {
-            await this.teamService.PostTeamAsync(team);
+            await this.teamService.CreateTeamAsync(team);
 
             return Ok(JsonConvert.SerializeObject(team));
         }

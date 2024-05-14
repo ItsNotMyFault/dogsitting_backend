@@ -1,20 +1,29 @@
-﻿using dogsitting_backend.Domain;
+﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace dogsitting_backend.ApplicationServices
 {
     public class CalendarService
     {
         private readonly IGenericRepository<Calendar> _calendarGenereicRepository;
+        private readonly CalendarSQLRepository _calendarSQLRepository;
 
-        public CalendarService() { }
-        public CalendarService(IGenericRepository<Calendar> calendarGenereicRepository)
+        public CalendarService(IGenericRepository<Calendar> calendarGenereicRepository, CalendarSQLRepository calendarSQLRepository)
         {
 
             this._calendarGenereicRepository = calendarGenereicRepository;
+            this._calendarSQLRepository = calendarSQLRepository;
+        }
+
+
+        public async Task<Calendar> GetCalendarById(Guid id)
+        {
+            return this._calendarGenereicRepository.Build().Where(c => c.Id == id).First();
         }
 
         /// <summary>
@@ -24,34 +33,18 @@ namespace dogsitting_backend.ApplicationServices
         /// <returns></returns>
         public async Task<Calendar> GetTeamCalendar(string team)
         {
-            //todo optimize this.
-            //List<Calendar> calendars = this._calendarGenereicRepository.Build()
-            //.Include(calendar => calendar.Team)
-            //.ThenInclude(team => team.Admins)
-            //.Include(calendar => calendar.Reservations)
-            //.ThenInclude(reservation => reservation.Client).ToList();
-
-
             Calendar calendar = this._calendarGenereicRepository.Build()
             .Include(calendar => calendar.Team)
             .ThenInclude(team => team.Admins)
             .Include(calendar => calendar.Reservations)
             .ThenInclude(reservation => reservation.Client)
             .Where(c => c.Team.NormalizedName == team).First();
-
-            //Calendar testCalendar = calendars.First();
-            //return testCalendar;
             return calendar;
         }
 
-        public async Task<List<Calendar>> GetAllCalendars()
+        private async Task<List<Availability>> GetCalendarAvailabilities(Guid calendarId)
         {
-            List<Calendar> calendars = this._calendarGenereicRepository.Build()
-            .Include(calendar => calendar.Team)
-            .ThenInclude(team => team.Admins)
-            .Include(calendar => calendar.Reservations)
-            .ThenInclude(reservation => reservation.Client).ToList();
-            return calendars;
+            return await this._calendarSQLRepository.GetCalendarAvailabilities(calendarId);
         }
 
         public async Task<List<CalendarEvent>> GetReservationEvents(string team)
@@ -63,8 +56,26 @@ namespace dogsitting_backend.ApplicationServices
         public async Task<List<BusyCalendarEvent>> GetCalendarBusyEvents(string team)
         {
             Calendar calendar = await this.GetTeamCalendar(team);
-            List<BusyCalendarEvent> events = calendar.GetBusyEvents();
+            if (calendar == null)
+            {
+                throw new Exception($"Calendar not found for team: {team}");
+            }
+            calendar.Availabilities = await this.GetCalendarAvailabilities(calendar.Id);
+            List<BusyCalendarEvent> events = calendar.GetComputedBusyEvents();
             return events;
+        }
+
+        public async Task<AvailabilitiesResponse> GetCalendarAvailabilitiesEvents(string team)
+        {
+            Calendar calendar = await this.GetTeamCalendar(team);
+            if (calendar == null)
+            {
+                throw new Exception($"Calendar not found for team: {team}");
+            }
+            calendar.Availabilities = await this.GetCalendarAvailabilities(calendar.Id);
+            List<BusyCalendarEvent> busyEvents = calendar.GetBusyEvents();
+            List<AvailableCalendarEvent> availableEvents = calendar.GetAvailableEvents();
+            return new AvailabilitiesResponse() { AvailableEvents = availableEvents, BusyEvents = busyEvents };
         }
 
         public async Task<List<CalendarEvent>> GetCalendarArrivalEvents(string team)
@@ -79,6 +90,32 @@ namespace dogsitting_backend.ApplicationServices
             Calendar calendar = await this.GetTeamCalendar(team);
             List<CalendarEvent> events = calendar.GetDepartureEvents();
             return events;
+        }
+
+        public async Task AddAvailabilities(string team, List<AvailabilityDto> availabilities)
+        {
+            List<Availability>  availabilitieList = availabilities.Select(date => new Availability(date.Date, date.IsAvailable)).ToList();
+            Calendar calendar = await this.GetTeamCalendar(team);
+
+            availabilitieList.ForEach(availability =>
+            {
+                availability.CalendarId = calendar.Id;
+            });
+            await this._calendarSQLRepository.AddAvailabilities(availabilitieList);
+        }
+
+        public async Task DeleteAvailabilities(string team, List<AvailabilityDto> availabilityDtoList)
+        {
+            List<DateTime> availabilitieList = availabilityDtoList.Select(date => DateTime.Parse(date.Date)).ToList();
+            
+            Calendar calendar = await this.GetTeamCalendar(team);
+            var availabilitieList2 = await this._calendarSQLRepository.FindAvailabilities(calendar.Id, availabilitieList);
+            await this._calendarSQLRepository.DeleteAvailabilities(availabilitieList2);
+        }
+
+        public async Task UpdateCalendarAsync(Calendar calendar)
+        {
+            await this._calendarSQLRepository.Update(calendar);
         }
 
         //OPTIONS

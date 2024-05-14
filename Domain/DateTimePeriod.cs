@@ -10,6 +10,13 @@ namespace dogsitting_backend.Domain
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int WeekNumber;
+
+        public DateTimePeriod(string date)
+        {
+            var dateT = Convert.ToDateTime(date);
+            this.StartDate = dateT;
+            this.EndDate = dateT;
+        }
         public DateTimePeriod(DateTime date)
         {
             this.StartDate = date;

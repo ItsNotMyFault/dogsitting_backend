@@ -22,8 +22,6 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Reservations.Where(reservation => reservation.Id == Id).FirstAsync();
         }
 
-
-
         public async Task<List<Reservation>> GetAllReservationsAsync()
         {
             return await this.context.Reservations.Include("Team").ToListAsync();
@@ -41,8 +39,7 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<List<Reservation>> GetReservationsByTeamIdAsync(Guid teamId)
         {
-            var ttt =  await this.context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(cal => cal.Team).ThenInclude(team => team.Admins).Where(e => e.Calendar.Team.Id == teamId).ToListAsync();
-            return ttt;
+            return await this.context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(cal => cal.Team).ThenInclude(team => team.Admins).Where(e => e.Calendar.Team.Id == teamId).ToListAsync();
         }
 
 

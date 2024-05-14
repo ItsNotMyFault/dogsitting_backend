@@ -14,6 +14,7 @@ namespace dogsitting_backend.Infrastructure
 
         public DbSet<Team> Teams { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
+        public DbSet<Availability> Availabilities{ get; set; }
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<ApplicationRole> Roles { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
@@ -32,7 +33,6 @@ namespace dogsitting_backend.Infrastructure
             modelBuilder.Entity<Calendar>().ToTable("Calendars").HasMany(t => t.Reservations).WithOne(r => r.Calendar);
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.Reservations).WithOne(r => r.Client);
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.UserLogins).WithOne(r => r.User);
-            //TODO: Fix la relation Reservation => client et la relation Calendrier => team
 
 
             modelBuilder.Entity<Team>()

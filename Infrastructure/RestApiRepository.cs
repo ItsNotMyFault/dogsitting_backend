@@ -5,7 +5,6 @@ namespace dogsitting_backend.Infrastructure
 {
     public abstract class RestApiRepository
     {
-        //TODO: Uniformiser l'utilisation du httpclient à l'aide de l'injection de dépendance.
         protected HttpClient HttpClient { get; set; } = new();
         public static AuthenticationHeaderValue GetBasicAuthenticationHeader(string username, string password)
         {
@@ -25,7 +24,7 @@ namespace dogsitting_backend.Infrastructure
             AuthenticationHeaderValue header = new(TokenName, accessToken);
             return header;
         }
-        public async Task<string> PostRequest(string requestURL, HttpContent content, AuthenticationHeaderValue authHeader = null)
+        public async Task<string> PostRequest(string requestURL, HttpContent content, AuthenticationHeaderValue? authHeader = null)
         {
             HttpClient client = new();
             client.DefaultRequestHeaders.Authorization = authHeader;
@@ -39,7 +38,7 @@ namespace dogsitting_backend.Infrastructure
             return responseString;
         }
 
-        public async Task<HttpResponseMessage> PostRequest(string requestURL, AuthenticationHeaderValue authHeader = null)
+        public async Task<HttpResponseMessage> PostRequest(string requestURL, AuthenticationHeaderValue? authHeader = null)
         {
             Dictionary<string, string> values = new();
             FormUrlEncodedContent content = new(values);
@@ -55,7 +54,7 @@ namespace dogsitting_backend.Infrastructure
             return response;
         }
 
-        public async Task<string> PatchRequest(string requestURL, HttpContent content, AuthenticationHeaderValue authHeader = null)
+        public async Task<string> PatchRequest(string requestURL, HttpContent content, AuthenticationHeaderValue? authHeader = null)
         {
             this.HttpClient.DefaultRequestHeaders.Authorization = authHeader;
             HttpResponseMessage response = this.HttpClient.PatchAsync(requestURL, content).Result;
@@ -67,7 +66,7 @@ namespace dogsitting_backend.Infrastructure
             return responseString;
         }
 
-        public async Task<string> GetRequest(string requestURL, AuthenticationHeaderValue authHeader = null)
+        public async Task<string> GetRequest(string requestURL, AuthenticationHeaderValue? authHeader = null)
         {
             HttpClient client = new();
             client.DefaultRequestHeaders.Authorization = authHeader;

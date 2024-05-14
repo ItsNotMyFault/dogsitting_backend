@@ -29,7 +29,7 @@ namespace dogsitting_backend.Domain
         public virtual ApplicationUser Client { get; set; }
 
         
-        public virtual Calendar Calendar { get; set; }
+        public required virtual Calendar Calendar { get; set; }
 
         public Guid CalendarId { get; set; }
 
@@ -37,7 +37,9 @@ namespace dogsitting_backend.Domain
         public string ReservationCalendarTitle{ get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client?.Name}"; }
 
-        public Reservation() { }
+        public DateTime CreatedAt { get; set; }
+        public DateTime ApprovedAt { get; set; }
+        public Reservation() { }//required for db initialization
 
         public Reservation(DateTimePeriod period, ApplicationUser client)
         {
@@ -56,9 +58,9 @@ namespace dogsitting_backend.Domain
             return events;
         }
 
-        public CalendarEvent GetDateRangeEvent()
+        public CalendarEvent GetReservationEvent()
         {
-            return new CalendarEvent(this.Id, this.Period, this.ReservationCalendarTitle);
+            return new ReservationCalendarEvent(this.Id, this.Period, this.ReservationCalendarTitle);
         }
     }
 }

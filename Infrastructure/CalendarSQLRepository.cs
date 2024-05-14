@@ -23,16 +23,6 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Calendars.Include("Team").Where(calendar => calendar.Team.Name == team).ToListAsync();
         }
 
-        public async Task<List<Reservation>> GetReservationsByCalendarIdAsync(Guid calendarId)
-        {
-            return await this.context.Reservations.Where(e => e.CalendarId == calendarId).ToListAsync();
-        }
-
-        public async Task<List<Reservation>> GetReservationsByUserIdAsync(Guid userId)
-        {
-            return await this.context.Reservations.Where(e => e.Client.Id == userId).ToListAsync();
-        }
-
 
         public async Task<Object> Create(Reservation reservation)
         {
@@ -41,5 +31,34 @@ namespace dogsitting_backend.Infrastructure
             return reservation;
         }
 
+        public async Task<Calendar> Update(Calendar calendar)
+        {
+            this.context.Calendars.Update(calendar);
+            await this.context.SaveChangesAsync();
+            return calendar;
+        }
+
+        public async Task<List<Availability>> GetCalendarAvailabilities(Guid id)
+        {
+            return await this.context.Availabilities.Where(Availability => Availability.CalendarId == id).ToListAsync();
+        }
+
+
+        public async Task AddAvailabilities(List<Availability> availabilities)
+        {
+            await this.context.Availabilities.AddRangeAsync(availabilities);
+            this.context.SaveChanges();
+        }
+
+        public async Task<List<Availability>> FindAvailabilities(Guid calendarId, List<DateTime> dates)
+        {
+            return await this.context.Availabilities.Where(availability => dates.Contains(availability.DateFrom) && availability.CalendarId == calendarId).ToListAsync();
+        }
+
+        public async Task DeleteAvailabilities(List<Availability> availabilities)
+        {
+            this.context.Availabilities.RemoveRange(availabilities);
+            this.context.SaveChanges();
+        }
     }
 }
