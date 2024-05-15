@@ -103,6 +103,19 @@ namespace dogsitting_backend.Domain.calendar
             });
             BusyEvents.ForEach(ev => { ev.ComputeBusyness(this); });
 
+            //todo add validation if day already added to busyeventlist.
+            this.Availabilities.ToList().ForEach(availability =>
+            {
+                bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
+                {
+                    return availability.Period.IsPeriodOverlappedByPeriod(busyEve.DateTimePeriod);
+                });
+                if (!busyDayAlreadyExists)
+                {
+                    BusyEvents.Add(new BusyCalendarEvent(availability));
+                }
+            });
+
             return BusyEvents;
             //create a list of fulltime day events with a condition on the calendar setting to determine
             //if each day is full / busy / free

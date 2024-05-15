@@ -24,7 +24,6 @@ namespace dogsitting_backend.Domain
             this.DateTo = reservation.DateTo;
             this.Client = reservation.Client;
             this.Team = reservation.Calendar.Team;
-
             this.LodgerCount = reservation.LodgerCount;
         }
 

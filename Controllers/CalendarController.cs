@@ -40,6 +40,12 @@ namespace dogsitting_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Mixes all availabilities and reservations of a team into a single list of busy events.
+        /// Used to quickly notice the availabilities of a team. (Can't differentiate availabilities vs reservations)
+        /// </summary>
+        /// <param name="team"></param>
+        /// <returns>List of BusyCalendarEvents</returns>
         [HttpGet]
         [AllowAnonymous]
         [Route("team/{team}/busyevents")]
@@ -54,6 +60,12 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
+        /// <summary>
+        /// Returns important data to MANAGE calendar availabilities of a team.
+        /// Lists are split to make management and frontend validation easier.
+        /// </summary>
+        /// <param name="team"></param>
+        /// <returns>List of availabilities AND busy events to mix in a single calendar.</returns>
         [HttpGet]
         [AllowAnonymous]
         [Route("team/{team}/availableevents")]

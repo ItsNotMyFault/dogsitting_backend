@@ -34,13 +34,13 @@ namespace dogsitting_backend.Domain
 
         public Guid CalendarId { get; set; }
 
-        public int LodgerCount { get; set; } = 1;
-        public string Notes { get; set; }
+        public required int LodgerCount { get; set; } //LODGER COUNT always 0 WHY!?!?!?
+        public string? Notes { get; set; }
         public string ReservationCalendarTitle { get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client?.Name}"; }
 
-        public DateTime CreatedAt { get; set; }
-        public DateTime ApprovedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+        public DateTime? ApprovedAt { get; set; }
         public Reservation() { }//required for db initialization
         public Reservation(Calendar calendar)
         {
