@@ -1,4 +1,5 @@
-﻿using dogsitting_backend.Domain;
+﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
@@ -58,23 +59,35 @@ namespace dogsitting_backend.ApplicationServices
         }
 
 
-        public async Task Create(Reservation reservation, string teamName)
+        public async Task Create(ReservationDto reservationDto, string teamName)
         {
-            AuthUser user = this._userService.GetCurrentUserAsync().Result;
-            if (reservation.Client.Id != user.ApplicationUser.Id)
+            if(reservationDto == null)
             {
-                throw new Exception("Cannot create a reservation for another user than yourself.");
+                throw new ArgumentNullException(nameof(reservationDto));
             }
-            reservation.CreatedAt = DateTime.Now;
-            reservation.UserId = user.ApplicationUser.Id;
-            reservation.Client = null;
+
+            AuthUser user = this._userService.GetCurrentUserAsync().Result;
+            //if (reservation.Client.Id != user.ApplicationUser.Id)
+            //{
+            //    throw new Exception("Cannot create a reservation for another user than yourself.");
+            //}
+
 
             Team team = await this._teamService.GetTeamByNormalizedName(teamName);
 
             Calendar calendar = await this._calendarService.GetTeamCalendar(teamName);
             calendar.TeamId = team.Id;
-            reservation.CalendarId = calendar.Id;
-            
+            Reservation reservation = new Reservation(calendar)
+            {
+                CreatedAt = DateTime.Now,
+                UserId = user.ApplicationUser.Id,
+                Client = null,
+                DateFrom = reservationDto.DateFrom,
+                DateTo = reservationDto.DateTo,
+                LodgerCount = reservationDto.LodgerCount,
+                Notes = reservationDto.Notes,
+            };
+
             await this.ReservationSQLRepository.Create(reservation);
             //TODO
             //Validate calendar is available on desired period.

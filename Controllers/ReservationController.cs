@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
@@ -59,7 +60,7 @@ namespace dogsitting_backend.Controllers
 
 
         [HttpPost("{team}", Name = "PostReservation")]
-        public async Task<ActionResult> Post([FromBody] Reservation reservation, string team)
+        public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
             await this.ReservationService.Create(reservation, team);
             //create a reservation for current logged in user.

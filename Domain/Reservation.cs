@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain.calendar;
 
 namespace dogsitting_backend.Domain
 {
     [Table("Reservations")]
-    public class Reservation :DBModel
+    public class Reservation : DBModel
     {
 
         // Define backing fields for DateFrom and DateTo
@@ -28,18 +29,24 @@ namespace dogsitting_backend.Domain
         public Guid UserId { get; set; }
         public virtual ApplicationUser Client { get; set; }
 
-        
-        public required virtual Calendar Calendar { get; set; }
+
+        public virtual Calendar Calendar { get; set; }
 
         public Guid CalendarId { get; set; }
 
         public int LodgerCount { get; set; } = 1;
-        public string ReservationCalendarTitle{ get => $"{this.Client?.Name} ({this.LodgerCount})"; }
+        public string Notes { get; set; }
+        public string ReservationCalendarTitle { get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client?.Name}"; }
 
         public DateTime CreatedAt { get; set; }
         public DateTime ApprovedAt { get; set; }
         public Reservation() { }//required for db initialization
+        public Reservation(Calendar calendar)
+        {
+            this.Calendar = calendar;
+            this.CalendarId = calendar.Id;
+        }
 
         public Reservation(DateTimePeriod period, ApplicationUser client)
         {
