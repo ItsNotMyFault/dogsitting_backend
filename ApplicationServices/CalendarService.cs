@@ -1,10 +1,8 @@
 ﻿using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain;
-using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace dogsitting_backend.ApplicationServices
 {
@@ -42,7 +40,7 @@ namespace dogsitting_backend.ApplicationServices
             return calendar;
         }
 
-        private async Task<List<Availability>> GetCalendarAvailabilities(Guid calendarId)
+        public async Task<List<Availability>> GetCalendarAvailabilities(Guid calendarId)
         {
             return await this._calendarSQLRepository.GetCalendarAvailabilities(calendarId);
         }
@@ -117,12 +115,5 @@ namespace dogsitting_backend.ApplicationServices
         {
             await this._calendarSQLRepository.Update(calendar);
         }
-
-        //OPTIONS
-
-        //itérer sur tous les journées CalendarEvent et faire le +X selon le lodgerCount.
-        //ça implique de supprimer les événements en double.
-
-
     }
 }

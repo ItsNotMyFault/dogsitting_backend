@@ -81,6 +81,7 @@ namespace dogsitting_backend.ApplicationServices
                 LodgerCount = reservationDto.LodgerCount,
                 Notes = reservationDto.Notes,
             };
+            calendar.Availabilities = await this._calendarService.GetCalendarAvailabilities(calendar.Id);
             calendar.ValidateReservation(reservation);
 
             await this.ReservationSQLRepository.Create(reservation);

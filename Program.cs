@@ -1,4 +1,3 @@
-using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Infrastructure;
 using dogsitting_backend.Startup;
 using dogsitting_backend.Startup.Middleware;
@@ -6,28 +5,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text.Json.Serialization;
-using System.Text.Json;
 using System.Globalization;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 var services = builder.Services;
 builder.Services.AddControllers();
-//builder.Services.AddControllers().AddJsonOptions(options =>
-//{
-//    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-//    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-//}); 
-
 
 IConfigurationRoot Configuration = builder.Configuration;
 IWebHostEnvironment Environment = builder.Environment;
+//does this really work? UTC setup
 CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
 TimeZoneInfo localTimeZone = TimeZoneInfo.Utc;
-//CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
 
 var isdev = Environment.IsDevelopment();
 services.AddSingleton<IConfiguration>(Configuration);
@@ -65,7 +54,6 @@ services.ConfigureApplicationCookie(options =>
         },
         OnSigningIn = async context =>
         {
-            ClaimsIdentity claimsIdentity = context.Principal.Identity as ClaimsIdentity;
             await Task.CompletedTask;
         },
         
@@ -126,14 +114,6 @@ builder.Services.AddHttpsRedirection(options =>
 {
     options.HttpsPort = 5001;
 });
-
-//builder.Services.AddHsts(options =>
-//{
-//    options.Preload = true;
-//    options.IncludeSubDomains = true;
-//    options.MaxAge = TimeSpan.FromDays(60);
-//});
-
 
 var app = builder.Build();
 

@@ -148,16 +148,13 @@ namespace dogsitting_backend.Domain.calendar
             }
 
             //validate availabilities
-            
-            Reservations.ToList().ForEach(resrv =>
+            this.UnavailablePeriods.ForEach(unavPeriod =>
             {
-                 bool isOverlapping = reservation.Period.IsPeriodOverlappedByPeriod(resrv.Period);
-                 if (isOverlapping)
-                 {
-       
-
-                 }
-             });
+                if (unavPeriod.IsPeriodOverlappedByPeriod(reservation.Period))
+                {
+                    throw new Exception("Reservation can't be created on an Unavailable date");
+                }
+            });
         }
 
         public int GetLodgerCountForPeriod(DateTimePeriod period)
