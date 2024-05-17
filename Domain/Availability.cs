@@ -24,18 +24,23 @@ namespace dogsitting_backend.Domain
 
         [ForeignKey("Calendar")]
         public Guid CalendarId { get; set; }
-        
+
         public Calendar Calendar { get; set; }
         public bool IsAllday { get; set; }
-        public bool IsAvailable{ get; set; }
+        public bool IsAvailable { get; set; }
 
-        public Availability(string date, bool isAvailable) {
+        public Availability(string date, bool isAvailable)
+        {
             this.Period = new DateTimePeriod(date);
             this.IsAvailable = isAvailable;
         }
 
-        public Availability()
+        public Availability() { }
+
+
+        public override string ToString()
         {
+            return $"{Period}";
         }
 
     }

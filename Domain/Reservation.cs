@@ -58,7 +58,9 @@ namespace dogsitting_backend.Domain
         public List<CalendarEvent> GetDailyEvents()
         {
             List<CalendarEvent> events = [];
-            foreach (DateTime datetime in this.Period.EachDay())
+            List<CalendarEvent> events2 = [];
+            IEnumerable<DateTime> dates = this.Period.ToLocalTimezone().EachDay();
+            foreach (DateTime datetime in dates)
             {
                 events.Add(new CalendarEvent(datetime));
             };
@@ -67,7 +69,12 @@ namespace dogsitting_backend.Domain
 
         public CalendarEvent GetReservationEvent()
         {
-            return new ReservationCalendarEvent(this.Id, this.Period, this.ReservationCalendarTitle);
+            return new ReservationCalendarEvent(this.Id, this.Period.ToLocalTimezone(), this.ReservationCalendarTitle);
+        }
+
+        public override string ToString()
+        {
+            return $"{Period}";
         }
     }
 }

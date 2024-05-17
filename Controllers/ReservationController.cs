@@ -59,11 +59,18 @@ namespace dogsitting_backend.Controllers
         }
 
 
-        [HttpPost("{team}", Name = "PostReservation")]
+        [HttpPost("{team}", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
-            await this.ReservationService.Create(reservation, team);
-            //create a reservation for current logged in user.
+            await this.ReservationService.CreateReservationForCurrentUser(reservation, team);
+            return Ok();
+        }
+
+        [HttpPost("{Id}/approve", Name = "ApproveReservation")]
+        public async Task<ActionResult> ApproveReservation([FromRoute] Guid Id)
+        {
+
+            await this.ReservationService.ApproveReservation(Id);
             return Ok();
         }
 

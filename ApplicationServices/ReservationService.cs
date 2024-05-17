@@ -1,25 +1,15 @@
 ﻿using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
-using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Infrastructure;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using Org.BouncyCastle.Utilities.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
 
 namespace dogsitting_backend.ApplicationServices
 {
     public class ReservationService
     {
         private readonly IGenericRepository<Reservation> _genericRepository;
-        private readonly IGenericRepository<Calendar> _calendarGenereicRepository;
+        private readonly IGenericRepository<Domain.calendar.Calendar> _calendarGenereicRepository;
         private readonly ReservationSQLRepository ReservationSQLRepository;
         private readonly AuthService _userService;
         private readonly CalendarService _calendarService;
@@ -30,7 +20,7 @@ namespace dogsitting_backend.ApplicationServices
             CalendarService calendarService,
             TeamService teamService,
             IGenericRepository<Reservation> genereicRepository,
-            IGenericRepository<Calendar> calendarGenereicRepository,
+            IGenericRepository<Domain.calendar.Calendar> calendarGenereicRepository,
             ReservationSQLRepository reservationSQLRepository
         )
         {
@@ -46,7 +36,7 @@ namespace dogsitting_backend.ApplicationServices
         public async Task<IEnumerable<ReservationResponse>> GetReservationsByUserId(Guid userId)
         {
             List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByUserIdAsync(userId);
-            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderBy(t => t.DateFrom);
+            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
 
         }
 
@@ -54,32 +44,36 @@ namespace dogsitting_backend.ApplicationServices
         {
             Team team = await this._teamService.GetTeamByNormalizedName(teamName);
             List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByTeamIdAsync(team.Id);
-            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderBy(t => t.DateFrom);
+            return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
 
         }
 
+        public async Task ApproveReservation(Guid ReservationId)
+        {
+            Reservation reservation = await this.ReservationSQLRepository.FindById(ReservationId);
+            await this.ReservationSQLRepository.Approve(reservation);
+        }
 
-        public async Task Create(ReservationDto reservationDto, string teamName)
+        public async Task CreateReservationForCurrentUser(ReservationDto reservationDto, string teamName)
         {
             if(reservationDto == null)
             {
                 throw new ArgumentNullException(nameof(reservationDto));
             }
-
+            if(reservationDto.LodgerCount == 0)
+            {
+                throw new Exception("LodgerCount parameter must be higher than 0");
+            }
             AuthUser user = this._userService.GetCurrentUserAsync().Result;
-            //if (reservation.Client.Id != user.ApplicationUser.Id)
-            //{
-            //    throw new Exception("Cannot create a reservation for another user than yourself.");
-            //}
 
 
             Team team = await this._teamService.GetTeamByNormalizedName(teamName);
 
-            Calendar calendar = await this._calendarService.GetTeamCalendar(teamName);
+            Domain.calendar.Calendar calendar = await this._calendarService.GetTeamCalendar(teamName);
+
             calendar.TeamId = team.Id;
             Reservation reservation = new Reservation(calendar)
             {
-                CreatedAt = DateTime.Now,
                 UserId = user.ApplicationUser.Id,
                 Client = null,
                 DateFrom = reservationDto.DateFrom,
@@ -87,6 +81,7 @@ namespace dogsitting_backend.ApplicationServices
                 LodgerCount = reservationDto.LodgerCount,
                 Notes = reservationDto.Notes,
             };
+            calendar.ValidateReservation(reservation);
 
             await this.ReservationSQLRepository.Create(reservation);
             //TODO
@@ -97,6 +92,10 @@ namespace dogsitting_backend.ApplicationServices
         public async Task Delete(Guid Id)
         {
             Reservation reservation = await this.ReservationSQLRepository.FindById(Id);
+            if(reservation == null)
+            {
+                throw new Exception("Reservation not found.");
+            }
             await this.ReservationSQLRepository.Delete(reservation);
         }
 

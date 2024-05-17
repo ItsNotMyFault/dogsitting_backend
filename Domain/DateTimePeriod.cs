@@ -19,6 +19,8 @@ namespace dogsitting_backend.Domain
         }
         public DateTimePeriod(DateTime date)
         {
+            var test1 = date.ToLocalTime();
+            var test2 = date.ToUniversalTime();
             this.StartDate = date;
             this.EndDate = date;
         }
@@ -33,6 +35,10 @@ namespace dogsitting_backend.Domain
             this.EndDate = Convert.ToDateTime(EndDate);
         }
 
+        public DateTimePeriod ToLocalTimezone()
+        {
+            return new DateTimePeriod(this.StartDate.ToLocalTime(), this.EndDate.ToLocalTime());
+        }
         public override string ToString()
         {
             return this.StartDate.ToString("yyyy-MM-dd") + " au " + this.EndDate.ToString("yyyy-MM-dd");

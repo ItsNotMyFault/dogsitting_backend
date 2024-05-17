@@ -12,8 +12,7 @@ namespace dogsitting_backend.Domain.calendar
         {
             this.EventSubject = eventSubject;
             this.DateTimePeriod = DateTimePeriod;
-            this.ReservationId = reservationId;
-            this.Id = Guid.NewGuid();
+            this.Id = reservationId;
         }
     }
 }

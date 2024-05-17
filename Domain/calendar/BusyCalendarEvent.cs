@@ -50,20 +50,20 @@ namespace dogsitting_backend.Domain.calendar
             int maxLodgerCount = DateTimePeriod.IsWeekend() ? calendar.MaxWeekendDaysLodgerCount : calendar.MaxWeekDaysLodgerCount;
             SetBusyStatus(maxLodgerCount);
             //do other work with calendar
-            if (calendar.UseUnavailabilities && calendar.UnavailablePeriods.Any(uPeriod => uPeriod.IsPeriodOverlappedByPeriod(DateTimePeriod)))
-            {
-                SetFull();
-            }
+            //if (calendar.UseUnavailabilities && calendar.UnavailablePeriods.Any(uPeriod => uPeriod.IsPeriodOverlappedByPeriod(DateTimePeriod)))
+            //{
+            //    SetFull();
+            //}
 
-            if (calendar.UseAvailabilities && calendar.AvailablePeriods.All(aPeriod => DateTimePeriod.IsPeriodOverlappedByPeriod(aPeriod)))
-            {
-                SetBusy();
-            }
+            //if (calendar.UseAvailabilities && calendar.AvailablePeriods.All(aPeriod => DateTimePeriod.IsPeriodOverlappedByPeriod(aPeriod)))
+            //{
+            //    SetBusy();
+            //}
 
         }
 
         /// <summary>
-        /// determine if lodger count is over, free or within margins
+        /// determine if lodger count is over, free or within margins of the team's calendar
         /// </summary>
         /// <param name="maxLodgerCount"></param>
         private void SetBusyStatus(int maxLodgerCount)
@@ -86,6 +86,7 @@ namespace dogsitting_backend.Domain.calendar
             IsFree = true;
             IsBusy = false;
             IsFull = false;
+            LodgerCount = 0;
         }
 
         private void SetBusy()

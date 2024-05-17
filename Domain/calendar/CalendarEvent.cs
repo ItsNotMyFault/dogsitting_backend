@@ -41,7 +41,7 @@ namespace dogsitting_backend.Domain.calendar
 
         public override string ToString()
         {
-            return $"{EventSubject} {DateTimePeriod.StartDate.ToString("yyyy-MM-dd")}";
+            return $"{EventSubject} {DateTimePeriod}";
         }
 
 

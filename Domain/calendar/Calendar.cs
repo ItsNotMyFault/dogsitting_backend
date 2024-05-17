@@ -14,9 +14,22 @@ namespace dogsitting_backend.Domain.calendar
         /// Can only choose once at a time.
         /// </summary>
         [NotMapped]
-        public List<DateTimePeriod> UnavailablePeriods { get; set; }
+        public List<DateTimePeriod> UnavailablePeriods
+        {
+            get
+            {
+                return this.Availabilities.Where(availability => !availability.IsAvailable).Select(availability => availability.Period).ToList();
+            }
+        }
+
         [NotMapped]
-        public List<DateTimePeriod> AvailablePeriods { get; set; }
+        public List<DateTimePeriod> AvailablePeriods
+        {
+            get
+            {
+                return this.Availabilities.Where(availability => availability.IsAvailable).Select(availability => availability.Period).ToList();
+            }
+        }
         public List<CalendarEvent> DepartureEvents { get; set; } = new List<CalendarEvent>();
         public List<CalendarEvent> ArrivalEvents { get; set; } = new List<CalendarEvent>();
 
@@ -82,6 +95,11 @@ namespace dogsitting_backend.Domain.calendar
 
             this.Reservations.ToList().ForEach(reservation =>
             {
+
+                var original = reservation.DateFrom;
+                var test1 = reservation.DateFrom.ToUniversalTime();
+                var test2 = reservation.DateFrom.ToLocalTime();
+
                 reservation.GetDailyEvents().ForEach(ev =>
                 {
                     bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
@@ -103,12 +121,12 @@ namespace dogsitting_backend.Domain.calendar
             });
             BusyEvents.ForEach(ev => { ev.ComputeBusyness(this); });
 
-            //todo add validation if day already added to busyeventlist.
+
             this.Availabilities.ToList().ForEach(availability =>
             {
                 bool busyDayAlreadyExists = BusyEvents.Any(busyEve =>
                 {
-                    return availability.Period.IsPeriodOverlappedByPeriod(busyEve.DateTimePeriod);
+                    return availability.Period.ToLocalTimezone().IsPeriodOverlappedByPeriod(busyEve.DateTimePeriod.ToLocalTimezone());
                 });
                 if (!busyDayAlreadyExists)
                 {
@@ -117,8 +135,36 @@ namespace dogsitting_backend.Domain.calendar
             });
 
             return BusyEvents;
-            //create a list of fulltime day events with a condition on the calendar setting to determine
-            //if each day is full / busy / free
+        }
+
+        public void ValidateReservation(Reservation reservation)
+        {
+            //validate count.
+            int currentCount = this.GetLodgerCountForPeriod(reservation.Period);
+            bool isNewCountValid = (currentCount + reservation.LodgerCount) <= this.MaxWeekDaysLodgerCount;
+            if (!isNewCountValid)
+            {
+                throw new Exception("Reservation has too big of a lodgerCount for current calendar team's settings.");
+            }
+
+            //validate availabilities
+            
+            Reservations.ToList().ForEach(resrv =>
+            {
+                 bool isOverlapping = reservation.Period.IsPeriodOverlappedByPeriod(resrv.Period);
+                 if (isOverlapping)
+                 {
+       
+
+                 }
+             });
+        }
+
+        public int GetLodgerCountForPeriod(DateTimePeriod period)
+        {
+            //this.Reservations.ev
+            List<Reservation> reservationsInPeriod = this.Reservations.ToList().Where(resrv => resrv.Period.IsPeriodOverlappedByPeriod(period)).ToList();
+            return reservationsInPeriod.Sum(resrv => resrv.LodgerCount);
         }
 
         public List<AvailableCalendarEvent> GetAvailableEvents()

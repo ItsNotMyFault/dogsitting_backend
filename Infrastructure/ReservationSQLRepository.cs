@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.Domain;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -45,6 +46,8 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<Object> Create(Reservation reservation)
         {
+            reservation.CreatedAt = DateTime.Now.ToUniversalTime();
+            var test = reservation.CreatedAt?.ToLocalTime();
             this.context.Reservations.Add(reservation);
             await this.context.SaveChangesAsync();
             return reservation;
@@ -53,6 +56,14 @@ namespace dogsitting_backend.Infrastructure
         public async Task<Object> Delete(Reservation reservation)
         {
             this.context.Reservations.Remove(reservation);
+            await this.context.SaveChangesAsync();
+            return reservation;
+        }
+
+        public async Task<Object> Approve(Reservation reservation)
+        {
+            reservation.ApprovedAt = DateTime.Now.ToUniversalTime();
+            this.context.Reservations.Update(reservation);
             await this.context.SaveChangesAsync();
             return reservation;
         }

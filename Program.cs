@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Globalization;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddControllers();
 
 IConfigurationRoot Configuration = builder.Configuration;
 IWebHostEnvironment Environment = builder.Environment;
+CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+TimeZoneInfo localTimeZone = TimeZoneInfo.Utc;
+//CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern = "yyyy-MM-dd";
 
 var isdev = Environment.IsDevelopment();
 services.AddSingleton<IConfiguration>(Configuration);
@@ -71,8 +75,6 @@ services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddOAuthServices();
 builder.Services.AddHttpContextAccessor();
-
-
 
 services.AddCors(options =>
 {

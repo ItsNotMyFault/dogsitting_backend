@@ -21,9 +21,10 @@ namespace dogsitting_backend.Startup.Middleware
             catch (Exception error)
             {
                 var response = context.Response;
+                var message = error?.Message;
                 response.ContentType = "application/json";
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                var result = JsonSerializer.Serialize(new { message = error?.Message, code = response.StatusCode });
+                var result = JsonSerializer.Serialize(new { message, code = response.StatusCode });
                 await response.WriteAsync(result);
             }
         }
