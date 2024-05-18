@@ -148,6 +148,8 @@ namespace dogsitting_backend.Domain.calendar
             }
 
             //validate availabilities
+            //TODO: add validation according to settings => if(this.UseUnavailabilities)
+
             this.UnavailablePeriods.ForEach(unavPeriod =>
             {
                 if (unavPeriod.IsPeriodOverlappedByPeriod(reservation.Period))

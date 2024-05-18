@@ -31,12 +31,17 @@ namespace dogsitting_backend.ApplicationServices
         /// <returns></returns>
         public async Task<Calendar> GetTeamCalendar(string team)
         {
-            Calendar calendar = this._calendarGenereicRepository.Build()
+            Calendar calendar = await this._calendarGenereicRepository.Build()
             .Include(calendar => calendar.Team)
             .ThenInclude(team => team.Admins)
             .Include(calendar => calendar.Reservations)
             .ThenInclude(reservation => reservation.Client)
-            .Where(c => c.Team.NormalizedName == team).First();
+            .Where(c => c.Team.NormalizedName == team).FirstAsync();
+            if (calendar != null)
+            {
+                calendar.Reservations = calendar.Reservations.Where(r => r.ApprovedAt != null).ToList();
+            }
+
             return calendar;
         }
 
@@ -92,7 +97,7 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task AddAvailabilities(string team, List<AvailabilityDto> availabilities)
         {
-            List<Availability>  availabilitieList = availabilities.Select(date => new Availability(date.Date, date.IsAvailable)).ToList();
+            List<Availability> availabilitieList = availabilities.Select(date => new Availability(date.Date, date.IsAvailable)).ToList();
             Calendar calendar = await this.GetTeamCalendar(team);
 
             availabilitieList.ForEach(availability =>
@@ -105,7 +110,7 @@ namespace dogsitting_backend.ApplicationServices
         public async Task DeleteAvailabilities(string team, List<AvailabilityDto> availabilityDtoList)
         {
             List<DateTime> availabilitieList = availabilityDtoList.Select(date => DateTime.Parse(date.Date)).ToList();
-            
+
             Calendar calendar = await this.GetTeamCalendar(team);
             var availabilitieList2 = await this._calendarSQLRepository.FindAvailabilities(calendar.Id, availabilitieList);
             await this._calendarSQLRepository.DeleteAvailabilities(availabilitieList2);
