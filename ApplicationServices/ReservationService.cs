@@ -37,7 +37,6 @@ namespace dogsitting_backend.ApplicationServices
         {
             List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByUserIdAsync(userId);
             return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
-
         }
 
         public async Task<IEnumerable<ReservationResponse>> GetReservationsByTeamName(string teamName)
@@ -45,7 +44,6 @@ namespace dogsitting_backend.ApplicationServices
             Team team = await this._teamService.GetTeamByNormalizedName(teamName);
             List<Reservation> reservations = await this.ReservationSQLRepository.GetReservationsByTeamIdAsync(team.Id);
             return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
-
         }
 
         public async Task ApproveReservation(Guid ReservationId)
