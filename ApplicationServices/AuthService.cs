@@ -38,8 +38,18 @@ namespace dogsitting_backend.ApplicationServices
             return applicationUser;
         }
 
+        public async Task Signout()
+        {
+             await this._signInManager.SignOutAsync();
+        }
+
+
         public async Task<bool> AuthenticateWithExternalProvider(ClaimsIdentity claimsIdentity, OAuthTokenResponse oAuthTokenResponse)
         {
+            if(claimsIdentity == null && oAuthTokenResponse == null)
+            {
+                throw new Exception("Missing oauth token and claims");
+            }
 
             if(this.claimsPrincipal != null)
             {
@@ -92,7 +102,6 @@ namespace dogsitting_backend.ApplicationServices
                     await this._userManager.AddLoginAsync(createdUser, userLoginInfo);
                     await this._signInManager.SignInAsync(createdUser, false);
                 }
-
             }
 
             return true;

@@ -64,22 +64,16 @@ services.ConfigureApplicationCookie(options =>
 builder.Services.AddOAuthServices();
 builder.Services.AddHttpContextAccessor();
 
+
 services.AddCors(options =>
 {
-    options.AddPolicy("VueCorsPolicy",
+    options.AddPolicy("AllowLocalhost4000",
         builder =>
         {
-            builder.WithOrigins(new string[] {
-                "http://localhost:4000",
-                "https://localhost:4000",
-                "http://localhost:5188",
-                "https://localhost:5188",
-                "https://www.facebook.com"
-            })
-            //.SetIsOriginAllowedToAllowWildcardSubdomains()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-            //.AllowCredentials();
+            builder.WithOrigins("https://localhost:4000")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials(); // Allow credentials if cookies or other credentials are needed
         });
 });
 
@@ -127,7 +121,9 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseDeveloperExceptionPage();
-app.UseCors("VueCorsPolicy");
+
+app.UseCors("AllowLocalhost4000");
+
 app.UseHttpsRedirection();
 app.UseCookiePolicy();
 

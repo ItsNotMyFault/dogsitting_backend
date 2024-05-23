@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.Controllers;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Infrastructure;
 using dogsitting_backend.Infrastructure.store;
@@ -13,15 +14,31 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
+using System.Security.Policy;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 using umbrella.portal.CustomProvider;
+using static System.Net.WebRequestMethods;
 
 namespace dogsitting_backend.Startup
 {
     public static class RegisterAppAuthConfig
     {
+        //TODO set those in appsettings.json
         private readonly static string appid = "440736849687856";
         private readonly static string appsecret = "71dc26b3c7ce1bf1328abce52aa9aca8";
+
+        static string ReplaceRedirectUri(string url, string newRedirectUri)
+        {
+            string pattern = @"(redirect_uri=)([^&]*)";
+            string replacement = $"$1{newRedirectUri}";
+
+            string result = Regex.Replace(url, pattern, replacement);
+
+            return result;
+        }
 
         public static void AddOAuthServices(this IServiceCollection services)
         {
@@ -30,15 +47,15 @@ namespace dogsitting_backend.Startup
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = FacebookDefaults.AuthenticationScheme;
             })
-            //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddFacebook(facebookOptions =>
             {
                 facebookOptions.AppId = appid;
                 facebookOptions.AppSecret = appsecret;
                 facebookOptions.AccessDeniedPath = "/AccessDeniedPathInfo";
+                //specifying the callback prevent the redirect to my controller method for some reason. Which causes a OnRemoteFailure event.
+                //facebookOptions.CallbackPath = "/facebook-callback";
                 facebookOptions.AuthorizationEndpoint = "https://www.facebook.com/v14.0/dialog/oauth";
-                //facebookOptions.SaveTokens = true;
-                facebookOptions.Events = new Microsoft.AspNetCore.Authentication.OAuth.OAuthEvents()
+                facebookOptions.Events = new OAuthEvents()
                 {
                     OnAccessDenied = async context =>
                     {
@@ -48,33 +65,19 @@ namespace dogsitting_backend.Startup
                     {
                         OAuthTokenResponse tokenResponse = context.TokenResponse;
                         string serializedAccessToken = JsonConvert.SerializeObject(tokenResponse);
-                        context.HttpContext.Session.SetString("facebook_accesstoken", serializedAccessToken);
-                        ClaimsIdentity claimsIdentity = context.Principal.Identity as ClaimsIdentity;
-                        AuthService authenticationService = context.HttpContext.RequestServices.GetRequiredService(typeof(AuthService)) as AuthService;
 
-                        bool isSuccess = await authenticationService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
+                        context.HttpContext.Session.SetString("facebook_accesstoken", serializedAccessToken);
                         await Task.CompletedTask;
                     },
                     OnRedirectToAuthorizationEndpoint = async context =>
                     {
-                        var request = context.Request;
-                        string facebookOauthUrl = context.RedirectUri + "&display=popup&pip";
-                        //HttpClient client = new();
-
-                        //HttpResponseMessage response = client.PostAsync(context.RedirectUri + "&display=popup&pip", null).Result;
-                        //string responseString = await response.Content.ReadAsStringAsync();
-                        //if (!response.IsSuccessStatusCode)
-                        //{
-                        //    throw new HttpRequestException($"POST: {response.StatusCode} => {response.ReasonPhrase} : {responseString}", new HttpRequestException(), response.StatusCode);
-                        //}
-
-
-                        context.HttpContext.Response.Redirect(facebookOauthUrl);
+                        context.HttpContext.Response.Redirect(context.RedirectUri);
                         await Task.CompletedTask;
                     },
                     OnRemoteFailure = async context =>
                     {
                         var errorMessage = context.Failure.Message;
+                        context.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
                         await Task.CompletedTask;
                     },
                     OnTicketReceived = async context =>
@@ -83,6 +86,7 @@ namespace dogsitting_backend.Startup
                     },
                 };
             });
+
             services.AddIdentity<AuthUser, ApplicationRole>()
                 .AddUserStore<CustomUserStore>()
                 .AddRoleStore<CustomRoleStore>();

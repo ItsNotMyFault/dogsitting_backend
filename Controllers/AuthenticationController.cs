@@ -10,21 +10,27 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using dogsitting_backend.Domain.auth;
 using ZstdSharp;
+using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using NuGet.Protocol;
+using System.Text.Json;
 
 namespace dogsitting_backend.Controllers
 {
-
+    [AllowAnonymous]
     public class AuthenticationController : ControllerBase
     {
         private readonly ClaimsPrincipal claimsPrincipal;
-        private AuthService userService;
-        private AuthUser authUser;
+        private AuthService _authService;
+        private AuthUser _authUser;
+        private IHttpContextAccessor httpContextAccessor;
 
-        public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService userService, UserManager<AuthUser> userManager)
+        public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService authService, UserManager<AuthUser> userManager)
         {
+            this.httpContextAccessor = httpContextAccessor;
             this.claimsPrincipal = httpContextAccessor.HttpContext.User;
-            authUser = userManager.GetUserAsync(claimsPrincipal).Result;
-            this.userService = userService;
+            _authUser = userManager.GetUserAsync(claimsPrincipal).Result;
+            this._authService = authService;
 
         }
 
@@ -32,7 +38,7 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public IActionResult GetLoggedInUser()
         {
-            if(this.authUser == null)
+            if (this._authUser == null)
             {
                 throw new Exception("not authentified");
             }
@@ -41,7 +47,7 @@ namespace dogsitting_backend.Controllers
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
 
-            string json = JsonConvert.SerializeObject(this.authUser.ApplicationUser, settings);
+            string json = JsonConvert.SerializeObject(this._authUser.ApplicationUser, settings);
             return Ok(json);
         }
 
@@ -52,37 +58,62 @@ namespace dogsitting_backend.Controllers
         {
             var properties = new AuthenticationProperties
             {
-                RedirectUri = "https://localhost:4000"
-                //RedirectUri = "https://localhost:5188"
-                //RedirectUri = Url.Action(nameof(FacebookLoginCallback))
+                RedirectUri = "https://localhost:5188/facebook-callback"
             };
-            return Challenge(properties, "Facebook");
+            return Challenge(properties, FacebookDefaults.AuthenticationScheme);
         }
 
+
+        [HttpGet("facebook-callback")]
         [AllowAnonymous]
-        [HttpGet("signin-facebook")]
-        public async Task<IActionResult> FacebookLoginCallback(Object context)
+        public async Task<IActionResult> FacebookLoginCallback()
         {
-            var authenticateResult = await HttpContext.AuthenticateAsync("Facebook");
+            AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
+
 
             if (!authenticateResult.Succeeded)
             {
                 // Handle authentication failure
                 return RedirectToAction(nameof(Accessdenied));
             }
+            ClaimsPrincipal claimsPrincipal = authenticateResult.Principal;
+            ClaimsIdentity claimsIdentity = claimsPrincipal.Identity as ClaimsIdentity;
+            string serializedAccessToken = HttpContext.Session.GetString("facebook_accesstoken");
+            OAuthTokenResponse tokenResponse = this.RetrieveTokenResponseFromString(serializedAccessToken);
+            this._authService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
 
-            // Authentication succeeded, perform additional logic like storing user details or issuing JWT token.
-
-            return Ok(404);
+            return RedirectToAction(nameof(Home));
         }
 
+        private OAuthTokenResponse RetrieveTokenResponseFromString(string serializedAccessToken)
+        {
+            JsonDocument jsonDocument = JsonDocument.Parse(serializedAccessToken);
+            OAuthTokenResponse tokenResponse = OAuthTokenResponse.Success(jsonDocument);
+
+            // Extract values from JsonDocument
+            string accessToken = jsonDocument.RootElement.GetProperty("AccessToken").GetString();
+            string tokenType = jsonDocument.RootElement.GetProperty("TokenType").GetString();
+            string refreshToken = jsonDocument.RootElement.GetProperty("RefreshToken").GetString();
+            string expiresIn = jsonDocument.RootElement.GetProperty("ExpiresIn").GetString();
+            tokenResponse.AccessToken = accessToken;
+            tokenResponse.TokenType = tokenType;
+            tokenResponse.ExpiresIn = expiresIn;
+            tokenResponse.RefreshToken = refreshToken;
+            return tokenResponse;
+        }
 
         [AllowAnonymous]
         [HttpGet("accessdenied")]
-        public IActionResult Accessdenied()
+        public void Accessdenied()
         {
             this.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
-            return Ok("fail");
+        }
+
+        [AllowAnonymous]
+        [HttpGet("home")]
+        public void Home()
+        {
+            this.HttpContext.Response.Redirect("https://localhost:4000/home");
         }
 
 
@@ -115,9 +146,12 @@ namespace dogsitting_backend.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("LogOff")]
-        public IActionResult LogOff()
+        public async Task<IActionResult> LogOff()
         {
-            return Ok("Success");
+            await this._authService.Signout();
+            
+            this.HttpContext.Response.Redirect("https://localhost:4000/home");
+            return Ok("success");
         }
 
     }
