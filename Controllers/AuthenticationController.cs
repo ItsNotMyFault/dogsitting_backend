@@ -113,7 +113,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet("home")]
         public void Home()
         {
-            this.HttpContext.Response.Redirect("https://localhost:4000/home");
+            this.HttpContext.Response.Redirect("https://localhost:4000/");
         }
 
 
