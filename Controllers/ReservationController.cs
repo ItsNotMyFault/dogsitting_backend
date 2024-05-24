@@ -23,6 +23,19 @@ namespace dogsitting_backend.Controllers
             this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
         }
 
+        [HttpGet("{id}", Name = "AReservation")]
+        public async Task<ActionResult> GetReservationById([FromRoute] Guid id)
+        {
+            ReservationResponse reservation = (await this.ReservationService.FindReservation(id));
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(reservation, settings);
+            return Ok(json);
+        }
+
         [HttpGet("User/{id}", Name = "UserReservations")]
         public async Task<ActionResult> GetUserReservations([FromRoute] Guid id)
         {

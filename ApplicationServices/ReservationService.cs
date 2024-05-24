@@ -46,6 +46,13 @@ namespace dogsitting_backend.ApplicationServices
             return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
         }
 
+        public async Task<ReservationResponse> FindReservation(Guid ReservationId)
+        {
+            Reservation reservation = await this.ReservationSQLRepository.FindById(ReservationId);
+            return new ReservationResponse(reservation);
+
+        }
+
         public async Task ApproveReservation(Guid ReservationId)
         {
             Reservation reservation = await this.ReservationSQLRepository.FindById(ReservationId);

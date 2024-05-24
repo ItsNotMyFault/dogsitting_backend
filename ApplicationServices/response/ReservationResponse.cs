@@ -27,7 +27,7 @@ namespace dogsitting_backend.Domain
             this.ApprovedAt = reservation.ApprovedAt?.ToLocalTime();
             this.CreatedAt = reservation.CreatedAt?.ToLocalTime();
             this.Client = reservation.Client;
-            this.Team = reservation.Calendar.Team;
+            this.Team = reservation?.Calendar?.Team;
             this.LodgerCount = reservation.LodgerCount;
             this.Id = reservation.Id;
         }
