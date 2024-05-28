@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using NuGet.Protocol;
 using System.Text.Json;
+using Humanizer;
 
 namespace dogsitting_backend.Controllers
 {
@@ -51,8 +52,18 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
+        public int Quantity { get => this.Quantity; set => this.SetQuantity(value);}
+        public int SetQuantity(int value)
+        {
+            if(value < 1)
+            {
+                this.Quantity = 1;
+            }
+            return value;
+        }
 
-        [HttpGet("login")]
+
+            [HttpGet("login")]
         [AllowAnonymous]
         public IActionResult FacebookLogin()
         {

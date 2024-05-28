@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.Domain.calendar;
+using dogsitting_backend.Domain.media;
 using dogsitting_backend.Domain.Utils;
 
 namespace dogsitting_backend.Domain
@@ -12,7 +13,7 @@ namespace dogsitting_backend.Domain
 
         public DateTime? CreatedAt { get; set; }
 
-        public virtual ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();
+        public virtual ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();  //navigation property
         public virtual Calendar Calendar { get; set; }
 
         public Team()

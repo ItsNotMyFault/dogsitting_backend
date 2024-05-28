@@ -26,7 +26,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet("{id}", Name = "AReservation")]
         public async Task<ActionResult> GetReservationById([FromRoute] Guid id)
         {
-            ReservationResponse reservation = (await this.ReservationService.FindReservation(id));
+            ReservationResponse reservation = (await this.ReservationService.FindReservationResponse(id));
 
             var settings = new JsonSerializerSettings
             {
@@ -75,7 +75,7 @@ namespace dogsitting_backend.Controllers
         [HttpPost("{team}", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
-            await this.ReservationService.CreateReservationForCurrentUser(reservation, team);
+            await this.ReservationService.AddReservationToTeamCalendar(reservation, team);
             return Ok();
         }
 
@@ -84,6 +84,22 @@ namespace dogsitting_backend.Controllers
         {
 
             await this.ReservationService.ApproveReservation(Id);
+            return Ok();
+        }
+
+        [HttpPost("{Id}/media", Name = "AddMedia")]
+        public async Task<ActionResult> AddMedia([FromRoute] Guid Id)
+        {
+            List<IFormFile> files = Request.Form.Files.ToList();
+            await this.ReservationService.AddMediaToReservation(Id, files);
+            return Ok();
+        }
+
+        [HttpDelete("{Id}/media", Name = "RemoveMedia")]
+        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> files)
+        {
+
+            await this.ReservationService.RemoveMediaFromReservation(files);
             return Ok();
         }
 

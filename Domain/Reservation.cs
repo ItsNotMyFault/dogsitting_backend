@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain.calendar;
+using dogsitting_backend.Domain.media;
 
 namespace dogsitting_backend.Domain
 {
@@ -31,10 +32,11 @@ namespace dogsitting_backend.Domain
 
 
         public virtual Calendar Calendar { get; set; }
-
         public Guid CalendarId { get; set; }
+        //public ICollection<Media> Medias { get; set; } = new List<Media>(); //navigation property
+        public ICollection<ReservationMedia> ReservationMedias { get; set; } = new List<ReservationMedia>(); //navigation property
 
-        public required int LodgerCount { get; set; } //LODGER COUNT always 0 WHY!?!?!?
+        public required int LodgerCount { get; set; } 
         public string? Notes { get; set; }
         public string ReservationCalendarTitle { get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client?.Name}"; }

@@ -70,11 +70,52 @@ VALUES ("e0b2801d-f67c-11ee-a26a-00155dd4f30d", "aguay", "AGUAY", "alexis_raphae
 CREATE TABLE Availabilities (
     Id varchar(255) PRIMARY KEY,
     CalendarId varchar(255),
-    Date datetime NULL,
+    DateFrom datetime NULL,
+    DateTo datetime NULL,
+	IsAllDay bool NULL default false,
+    IsAvailable bool NULL default false,
 	CONSTRAINT fk_calendars_CalendarId FOREIGN KEY (CalendarId) REFERENCES Calendars(id)
 );
 
+CREATE TABLE medias (
+    Id varchar(255) PRIMARY KEY,
+    FileName VARCHAR(255) NOT NULL,
+    FileType VARCHAR(50),
+    FileSize INT,
+    FileData LONGBLOB,
+    UploadedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE TABLE teammedia (
+    TeamId varchar(255),
+    MediaId varchar(255),
+    PRIMARY KEY (TeamId, MediaId),
+    FOREIGN KEY (TeamId) REFERENCES teams(Id) ON DELETE CASCADE,
+    FOREIGN KEY (MediaId) REFERENCES media(Id) ON DELETE CASCADE
+);
+
+CREATE TABLE usermedia (
+    UserId varchar(255),
+    MediaId varchar(255),
+    PRIMARY KEY (UserId, MediaId ),
+    FOREIGN KEY (UserId) REFERENCES users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (MediaId ) REFERENCES media(Id) ON DELETE CASCADE
+);
+
+CREATE TABLE reservationmedia (
+    ReservationId varchar(255),
+    MediaId varchar(255),
+    PRIMARY KEY (ReservationId, MediaId),
+    FOREIGN KEY (ReservationId) REFERENCES reservations(Id) ON DELETE CASCADE,
+    FOREIGN KEY (MediaId) REFERENCES media(Id) ON DELETE CASCADE
+);
+
+
+
+select * from Availabilities;
+select * from Users;
+
+select * from calendars;
  
 select * from Users;
 
@@ -125,7 +166,15 @@ CREATE TABLE Teams (
 
 ALTER TABLE teams ADD COLUMN CreatedAt datetime null;
 
+ALTER TABLE reservations ADD COLUMN Notes varchar(3000) null;
+
+select * from reservations;
+delete from reservations where calendarId = '2e731e68-f682-11ee-a26a-00155dd4f30d';
+
 select * from teams;
+
+select * from availabilities;
+
 update Teams set NormalizedName = 'annieannick' where id = '2e731e68-f682-11ee-a26a-00155dd4f30d';
 update Teams set NormalizedName = 'alexis' where id = '2efa6903-f682-11ee-a26a-00155dd4f30d';
 update Teams set NormalizedName = 'anniel' where id = '2f68968c-f682-11ee-a26a-00155dd4f30d';

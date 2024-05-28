@@ -1,16 +1,7 @@
-﻿using dogsitting_backend.Domain;
-using dogsitting_backend.Domain.auth;
-using dogsitting_backend.Infrastructure;
+﻿using dogsitting_backend.Domain.auth;
 using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Threading.Tasks;
 
 namespace dogsitting_backend.ApplicationServices
 {

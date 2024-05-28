@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.ApplicationServices;
+using dogsitting_backend.Domain.repositories;
 using dogsitting_backend.Infrastructure;
 using Google.Protobuf.WellKnownTypes;
 
@@ -11,7 +12,8 @@ namespace dogsitting_backend.Startup
             
             services.AddTransient<TeamSQLRepository>();
             services.AddTransient<CalendarSQLRepository>();
-            services.AddTransient<ReservationSQLRepository>();
+            services.AddTransient<IReservationRepository, ReservationSQLRepository>();
+            services.AddTransient<MediaSQLRepository>();
             services.AddTransient<UserSQLRepository>();
             services.AddTransient<RoleSQLRepository>();
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));

@@ -1,6 +1,7 @@
 ﻿using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
+using dogsitting_backend.Domain.media;
 using Microsoft.EntityFrameworkCore;
 
 namespace dogsitting_backend.Infrastructure
@@ -20,19 +21,33 @@ namespace dogsitting_backend.Infrastructure
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<UserLogin> UserLogins { get; set; }
         public DbSet<UserToken> UserTokens { get; set; }
+        public DbSet<ReservationMedia> ReservationMedia { get; set; }
+        public DbSet<Media> Medias { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Reservation>()
-          .HasOne(r => r.Calendar) // One-to-one relationship with Calendar
-          .WithMany(c => c.Reservations)
-          .HasForeignKey(r => r.CalendarId)
-          .IsRequired();
+
+            modelBuilder.Entity<ReservationMedia>()
+           .HasKey(rm => new { rm.ReservationId, rm.MediaId });
+
+            modelBuilder.Entity<ReservationMedia>()
+                .HasOne(rm => rm.Reservation)
+                .WithMany(r => r.ReservationMedias)
+                .HasForeignKey(rm => rm.ReservationId);
+
+            modelBuilder.Entity<ReservationMedia>()
+                .HasOne(rm => rm.Media)
+                .WithMany(m => m.ReservationMedias)
+                .HasForeignKey(rm => rm.MediaId);
+
+
 
             modelBuilder.Entity<Calendar>().ToTable("Calendars").HasOne(x => x.Team).WithOne(x => x.Calendar);
             modelBuilder.Entity<Calendar>().ToTable("Calendars").HasMany(t => t.Reservations).WithOne(r => r.Calendar);
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.Reservations).WithOne(r => r.Client);
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.UserLogins).WithOne(r => r.User);
+   
+
 
 
             modelBuilder.Entity<Team>()
@@ -47,6 +62,7 @@ namespace dogsitting_backend.Infrastructure
                     join.HasKey("userId", "teamId"); // Specify the composite primary key
                 }
             );
+
 
             modelBuilder.Entity<ApplicationUser>()
             .HasMany(t => t.Roles)

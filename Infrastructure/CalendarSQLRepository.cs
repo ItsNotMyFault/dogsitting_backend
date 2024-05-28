@@ -23,19 +23,11 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Calendars.Include("Team").Where(calendar => calendar.Team.Name == team).ToListAsync();
         }
 
-
         public async Task<Object> Create(Reservation reservation)
         {
             this.context.Reservations.Add(reservation);
             await this.context.SaveChangesAsync();
             return reservation;
-        }
-
-        public async Task<Calendar> Update(Calendar calendar)
-        {
-            this.context.Calendars.Update(calendar);
-            await this.context.SaveChangesAsync();
-            return calendar;
         }
 
         public async Task<List<Availability>> GetCalendarAvailabilities(Guid id)

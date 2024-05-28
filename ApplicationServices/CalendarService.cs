@@ -116,9 +116,5 @@ namespace dogsitting_backend.ApplicationServices
             await this._calendarSQLRepository.DeleteAvailabilities(availabilitieList2);
         }
 
-        public async Task UpdateCalendarAsync(Calendar calendar)
-        {
-            await this._calendarSQLRepository.Update(calendar);
-        }
     }
 }

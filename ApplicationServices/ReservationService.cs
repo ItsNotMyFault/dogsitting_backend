@@ -1,16 +1,15 @@
 ﻿using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
+using dogsitting_backend.Domain.media;
+using dogsitting_backend.Domain.repositories;
 using dogsitting_backend.Infrastructure;
-using System.Globalization;
 
 namespace dogsitting_backend.ApplicationServices
 {
     public class ReservationService
     {
-        private readonly IGenericRepository<Reservation> _genericRepository;
-        private readonly IGenericRepository<Domain.calendar.Calendar> _calendarGenereicRepository;
-        private readonly ReservationSQLRepository ReservationSQLRepository;
+        private readonly IReservationRepository ReservationSQLRepository;
         private readonly AuthService _userService;
         private readonly CalendarService _calendarService;
         private readonly TeamService _teamService;
@@ -19,18 +18,14 @@ namespace dogsitting_backend.ApplicationServices
             AuthService userService,
             CalendarService calendarService,
             TeamService teamService,
-            IGenericRepository<Reservation> genereicRepository,
-            IGenericRepository<Domain.calendar.Calendar> calendarGenereicRepository,
-            ReservationSQLRepository reservationSQLRepository
+            IReservationRepository reservationRepository
         )
         {
 
             this._calendarService = calendarService;
             this._userService = userService;
             this._teamService = teamService;
-            this._genericRepository = genereicRepository;
-            this._calendarGenereicRepository = calendarGenereicRepository;
-            this.ReservationSQLRepository = reservationSQLRepository;
+            this.ReservationSQLRepository = reservationRepository;
         }
 
         public async Task<IEnumerable<ReservationResponse>> GetReservationsByUserId(Guid userId)
@@ -46,26 +41,27 @@ namespace dogsitting_backend.ApplicationServices
             return reservations.Select(reservation => new ReservationResponse(reservation)).ToList().OrderByDescending(t => t.CreatedAt);
         }
 
-        public async Task<ReservationResponse> FindReservation(Guid ReservationId)
+        public async Task<ReservationResponse> FindReservationResponse(Guid ReservationId)
         {
-            Reservation reservation = await this.ReservationSQLRepository.FindById(ReservationId);
+            Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(ReservationId);
             return new ReservationResponse(reservation);
 
         }
 
         public async Task ApproveReservation(Guid ReservationId)
         {
-            Reservation reservation = await this.ReservationSQLRepository.FindById(ReservationId);
-            await this.ReservationSQLRepository.Approve(reservation);
+            Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(ReservationId);
+            reservation.ApprovedAt = DateTime.Now.ToUniversalTime();
+            await this.ReservationSQLRepository.UpdateAsync(reservation);
         }
 
-        public async Task CreateReservationForCurrentUser(ReservationDto reservationDto, string teamName)
+        public async Task AddReservationToTeamCalendar(ReservationDto reservationDto, string teamName)
         {
-            if(reservationDto == null)
+            if (reservationDto == null)
             {
                 throw new ArgumentNullException(nameof(reservationDto));
             }
-            if(reservationDto.LodgerCount == 0)
+            if (reservationDto.LodgerCount == 0)
             {
                 throw new Exception("LodgerCount parameter must be higher than 0");
             }
@@ -89,20 +85,44 @@ namespace dogsitting_backend.ApplicationServices
             calendar.Availabilities = await this._calendarService.GetCalendarAvailabilities(calendar.Id);
             calendar.ValidateReservation(reservation);
 
-            await this.ReservationSQLRepository.Create(reservation);
+            await this.ReservationSQLRepository.AddAsync(reservation);
             //TODO
             //Validate calendar is available on desired period.
             //  IF NOT propose another team WHO IS. => check other teams.
+            //Redirect to new page? loads each team's availabilities in different colors?
         }
 
         public async Task Delete(Guid Id)
         {
-            Reservation reservation = await this.ReservationSQLRepository.FindById(Id);
-            if(reservation == null)
+            Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(Id);
+            if (reservation == null)
             {
                 throw new Exception("Reservation not found.");
             }
-            await this.ReservationSQLRepository.Delete(reservation);
+            await this.ReservationSQLRepository.DeleteAsync(reservation.Id);
+        }
+
+
+        public async Task AddMediaToReservation(Guid Id, IEnumerable<IFormFile> mediaList)
+        {
+            Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(Id);
+            if (reservation == null)
+            {
+                throw new Exception("Reservation not found.");
+            }
+            List<Media> medias = mediaList.Select(media => new Media(media)).ToList();
+            foreach (Media media in medias)
+            {
+                await this.ReservationSQLRepository.LinkMediaAsync(Id, media);
+            }
+        }
+
+        public async Task RemoveMediaFromReservation(IEnumerable<Guid> mediaIds)
+        {
+            foreach (Guid mediaId in mediaIds)
+            {
+                await this.ReservationSQLRepository.UnlinkMediaAsync(mediaId);
+            }
         }
 
 

@@ -1,72 +1,89 @@
-﻿using dogsitting_backend.ApplicationServices;
-using dogsitting_backend.Domain;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.media;
+using dogsitting_backend.Domain.repositories;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace dogsitting_backend.Infrastructure
 {
-    public class ReservationSQLRepository
+    public class ReservationSQLRepository : IReservationRepository
     {
-        public DogsittingDBContext context { get; set; }
+        private DogsittingDBContext Context { get; set; }
+        public MediaSQLRepository MediaRepository { get; set; }
 
-        public ReservationSQLRepository(DogsittingDBContext context)
+        public ReservationSQLRepository(DogsittingDBContext context, MediaSQLRepository mediaRepository)
         {
-            this.context = context;
+            this.Context = context;
+            this.MediaRepository = mediaRepository;
         }
 
-        public async Task<Reservation> FindById(Guid Id)
+
+        public Task<Reservation> GetByIdAsync(Guid id)
         {
-            return await this.context.Reservations.Where(reservation => reservation.Id == Id).FirstAsync();
+            return this.Context.Reservations.Where(reservation => reservation.Id == id).Include(reserv => reserv.Calendar).ThenInclude(calendar => calendar.Team).ThenInclude(team => team.Admins).FirstAsync();
         }
 
-        public async Task<List<Reservation>> GetAllReservationsAsync()
+        public async Task<List<Reservation>> GetAllAsync()
         {
-            return await this.context.Reservations.Include("Team").ToListAsync();
+            return await this.Context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(calendar => calendar.Team).ThenInclude(team => team.Admins).ToListAsync();
         }
 
-        public async Task<List<Reservation>> GetReservationsByCalendarIdAsync(Guid calendarId)
+        public async Task AddAsync(Reservation entity)
         {
-            return await this.context.Reservations.Where(e => e.CalendarId == calendarId).ToListAsync();
+            entity.CreatedAt = DateTime.Now.ToUniversalTime();
+            this.Context.Reservations.Add(entity);
+            await this.Context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Reservation entity)
+        {
+            entity.ApprovedAt = DateTime.Now.ToUniversalTime();
+            this.Context.Reservations.Update(entity);
+            await this.Context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            Reservation reservation = await this.Context.Reservations.FindAsync(id);
+            if (reservation != null)
+            {
+                this.Context.Reservations.Remove(reservation);
+                await this.Context.SaveChangesAsync();
+            }
+
         }
 
         public async Task<List<Reservation>> GetReservationsByUserIdAsync(Guid userId)
         {
-            return await this.context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(calendar => calendar.Team).ThenInclude(team => team.Admins).Where(e => e.Client.Id == userId).ToListAsync();
+            return await this.Context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(calendar => calendar.Team).ThenInclude(team => team.Admins).Where(e => e.Client.Id == userId).ToListAsync();
         }
 
         public async Task<List<Reservation>> GetReservationsByTeamIdAsync(Guid teamId)
         {
-            return await this.context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(cal => cal.Team).ThenInclude(team => team.Admins).Where(e => e.Calendar.Team.Id == teamId).ToListAsync();
+            return await this.Context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(cal => cal.Team).ThenInclude(team => team.Admins).Where(e => e.Calendar.Team.Id == teamId).ToListAsync();
         }
 
-
-        public async Task<Object> Create(Reservation reservation)
+        public async Task LinkMediaAsync(Guid reservationId, Media media)
         {
-            reservation.CreatedAt = DateTime.Now.ToUniversalTime();
-            var test = reservation.CreatedAt?.ToLocalTime();
-            this.context.Reservations.Add(reservation);
-            await this.context.SaveChangesAsync();
-            return reservation;
+            await MediaRepository.AddMediaAsync(media);
+
+            Reservation? reservation = await Context.Reservations.FindAsync(reservationId);
+            var reservationMedia = new ReservationMedia
+            {
+                ReservationId = reservationId,
+                MediaId = media.Id
+            };
+
+            if (reservation != null)
+            {
+           
+                await MediaRepository.AddReservationMediaAsync(reservationMedia);
+            }
         }
 
-        public async Task<Object> Delete(Reservation reservation)
+
+        public async Task UnlinkMediaAsync(Guid mediaId)
         {
-            this.context.Reservations.Remove(reservation);
-            await this.context.SaveChangesAsync();
-            return reservation;
+            await MediaRepository.DeleteMediaAsync(mediaId);
         }
-
-        public async Task<Object> Approve(Reservation reservation)
-        {
-            reservation.ApprovedAt = DateTime.Now.ToUniversalTime();
-            this.context.Reservations.Update(reservation);
-            await this.context.SaveChangesAsync();
-            return reservation;
-        }
-
     }
 }

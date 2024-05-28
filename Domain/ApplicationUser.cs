@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.Domain.auth;
+using dogsitting_backend.Domain.media;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
