@@ -33,6 +33,7 @@ public class ApplicationUser
     [Newtonsoft.Json.JsonIgnore]
     public virtual IList<ApplicationRole> Roles { get; set; }
     public virtual IList<UserLogin> UserLogins { get; set; } = new List<UserLogin>();
+    public ICollection<UserMedia> UserMedias { get; set; }
 
 
 }

@@ -1,5 +1,6 @@
 ﻿using dogsitting_backend.ApplicationServices;
 using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.ApplicationServices.response;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
@@ -72,6 +73,7 @@ namespace dogsitting_backend.Controllers
         }
 
 
+
         [HttpPost("{team}", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
@@ -87,6 +89,19 @@ namespace dogsitting_backend.Controllers
             return Ok();
         }
 
+        [HttpGet("{Id}/media")]
+        public async Task<ActionResult> GetReservationMedias([FromRoute] Guid Id)
+        {
+            List<MediaResponse> reservations = await this.ReservationService.GetReservationMedias(Id);
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(reservations, settings);
+            return Ok(json);
+        }
+
         [HttpPost("{Id}/media", Name = "AddMedia")]
         public async Task<ActionResult> AddMedia([FromRoute] Guid Id)
         {
@@ -96,10 +111,10 @@ namespace dogsitting_backend.Controllers
         }
 
         [HttpDelete("{Id}/media", Name = "RemoveMedia")]
-        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> files)
+        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> fileIds)
         {
 
-            await this.ReservationService.RemoveMediaFromReservation(files);
+            await this.ReservationService.RemoveMediaFromReservation(fileIds);
             return Ok();
         }
 

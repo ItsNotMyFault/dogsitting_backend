@@ -14,6 +14,7 @@ namespace dogsitting_backend.Domain
         public DateTime? CreatedAt { get; set; }
 
         public virtual ICollection<ApplicationUser> Admins { get; set; } = new List<ApplicationUser>();  //navigation property
+        public ICollection<TeamMedia> TeamMedias { get; set; }
         public virtual Calendar Calendar { get; set; }
 
         public Team()

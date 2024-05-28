@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.Domain.media;
+using Microsoft.EntityFrameworkCore;
 
 namespace dogsitting_backend.Infrastructure
 {
@@ -26,6 +27,11 @@ namespace dogsitting_backend.Infrastructure
         public async Task<Media> GetMediaByIdAsync(Guid id)
         {
             return await _context.Medias.FindAsync(id);
+        }
+
+        public async Task<List<Media>> GetMediaByReservationIdAsync(Guid id)
+        {
+            return await _context.Medias.Include(media => media.ReservationMedias).ThenInclude(reserMedia => reserMedia.Media).ToListAsync();
         }
 
         public async Task DeleteMediaAsync(Guid id)

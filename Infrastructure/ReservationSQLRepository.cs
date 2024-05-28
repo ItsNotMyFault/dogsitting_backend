@@ -62,6 +62,11 @@ namespace dogsitting_backend.Infrastructure
             return await this.Context.Reservations.Include(reserv => reserv.Calendar).ThenInclude(cal => cal.Team).ThenInclude(team => team.Admins).Where(e => e.Calendar.Team.Id == teamId).ToListAsync();
         }
 
+
+        public async Task<List<ReservationMedia>> GetMedias(Guid reservationId)
+        {
+            return await this.Context.ReservationMedia.Where(reservMedia => reservMedia.ReservationId == reservationId).Include(resr => resr.Reservation).ToListAsync();
+        }
         public async Task LinkMediaAsync(Guid reservationId, Media media)
         {
             await MediaRepository.AddMediaAsync(media);

@@ -8,6 +8,7 @@ namespace dogsitting_backend.Domain.repositories
         Task LinkMediaAsync(Guid reservationId, Media media);
         Task UnlinkMediaAsync(Guid mediaId);
         Task<Reservation> GetByIdAsync(Guid id);
+        Task<List<ReservationMedia>> GetMedias(Guid reservationId);
         Task<List<Reservation>> GetAllAsync();
         Task<List<Reservation>> GetReservationsByUserIdAsync(Guid userId);
         Task<List<Reservation>> GetReservationsByTeamIdAsync(Guid teamId);

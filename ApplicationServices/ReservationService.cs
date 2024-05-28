@@ -1,4 +1,5 @@
 ﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.ApplicationServices.response;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.media;
@@ -45,7 +46,12 @@ namespace dogsitting_backend.ApplicationServices
         {
             Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(ReservationId);
             return new ReservationResponse(reservation);
+        }
 
+        public async Task<ReservationResponse> FindReservationMediaResponse(Guid ReservationId)
+        {
+            Reservation reservation = await this.ReservationSQLRepository.GetByIdAsync(ReservationId);
+            return new ReservationResponse(reservation);
         }
 
         public async Task ApproveReservation(Guid ReservationId)
@@ -102,6 +108,11 @@ namespace dogsitting_backend.ApplicationServices
             await this.ReservationSQLRepository.DeleteAsync(reservation.Id);
         }
 
+        public async Task<List<MediaResponse>> GetReservationMedias(Guid Id)
+        {
+            List<ReservationMedia> reservationMedias = await this.ReservationSQLRepository.GetMedias(Id);
+            return reservationMedias.Select(x => new MediaResponse(x.Media)).ToList();
+        }
 
         public async Task AddMediaToReservation(Guid Id, IEnumerable<IFormFile> mediaList)
         {
