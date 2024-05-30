@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using dogsitting_backend.ApplicationServices;
 using Newtonsoft.Json;
 using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.ApplicationServices.response;
 
 namespace dogsitting_backend.Controllers
 {
@@ -14,21 +15,38 @@ namespace dogsitting_backend.Controllers
     public class ApplicationUserController : Controller
     {
         private readonly ApplicationUserService _applicationUserService;
+        private readonly AnimalService _animalService;
 
-        public ApplicationUserController(ApplicationUserService applicationUserService)
+        public ApplicationUserController(ApplicationUserService applicationUserService, AnimalService animalService)
         {
-            _applicationUserService = applicationUserService;
+            this._animalService = animalService;
+            this._applicationUserService = applicationUserService;
         }
 
         [HttpGet("{id}")]
         public ActionResult Details([FromRoute] Guid id)
         {
             ApplicationUser user = this._applicationUserService.GetUserById(id).Result;
-            //todo transform application user object to a response/dto to avoid showing implicit data
-            string json = JsonConvert.SerializeObject(user);
-
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(user, settings);
             return Ok(json);
         }
+
+        [HttpGet("{id}/animals")]
+        public ActionResult Animals([FromRoute] Guid id)
+        {
+            List<Animal> animals = this._animalService.GetAnimalsByUserId(id).Result;
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(animals, settings);
+            return Ok(json);
+        }
+
 
         [HttpPut("edit/{id}")]
         public async Task<IActionResult> Edit([FromRoute] Guid id, [FromBody] UpdateUserDto applicationUser)

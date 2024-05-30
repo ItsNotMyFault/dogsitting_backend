@@ -16,6 +16,7 @@ namespace dogsitting_backend.Startup
             services.AddTransient<MediaSQLRepository>();
             services.AddTransient<UserSQLRepository>();
             services.AddTransient<RoleSQLRepository>();
+            services.AddTransient<AnimalSQLRepository>();
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
         }

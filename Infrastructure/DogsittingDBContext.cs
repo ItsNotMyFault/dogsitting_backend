@@ -26,6 +26,7 @@ namespace dogsitting_backend.Infrastructure
         public DbSet<TeamMedia> TeamMedia { get; set; }
         public DbSet<UserMedia> UserMedia { get; set; }
         public DbSet<Media> Medias { get; set; }
+        public DbSet<Animal> Animals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,7 +38,9 @@ namespace dogsitting_backend.Infrastructure
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.Reservations).WithOne(r => r.Client);
             modelBuilder.Entity<ApplicationUser>().ToTable("Users").HasMany(t => t.UserLogins).WithOne(r => r.User);
 
-
+            modelBuilder.Entity<Animal>()
+            .Property(a => a.Gender)
+            .HasConversion<string>();
 
 
             modelBuilder.Entity<Team>()

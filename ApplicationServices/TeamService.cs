@@ -85,10 +85,11 @@ namespace dogsitting_backend.ApplicationServices
             return teamResponses;
         }
 
-        public async Task<Team> CreateTeamAsync(Team team)
+        public async Task<Team> CreateTeamAsync(CreateTeamDto team)
         {
             //get logged in user, check if he is already mapped to a team, if yes boom.
             //if not accept creation.
+            Team newTeam = new(team);
             AuthUser user = this._userService.GetCurrentUserAsync().Result;
 
             Team foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
@@ -97,17 +98,17 @@ namespace dogsitting_backend.ApplicationServices
                 throw new Exception("This user already has a team assigned to it.");
             }
 
-            foundTeam = this._teamSQLRepository.GetTeamByNormalizedName(team.NormalizedName).Result;
+            foundTeam = this._teamSQLRepository.GetTeamByNormalizedName(newTeam.NormalizedName).Result;
 
             if (foundTeam != null)
             {
                 throw new Exception("This team name is taken");
             }
 
-            team.NormalizeTeamName();
-            team.Admins.Add(user.ApplicationUser);
-            await _teamGenericRepository.AddAsync(team);
-            return team;
+            newTeam.NormalizeTeamName();
+            newTeam.Admins.Add(user.ApplicationUser);
+            await _teamGenericRepository.AddAsync(newTeam);
+            return newTeam;
         }
 
         public async Task<Team> UpdateTeamAsync(Guid id, UpdateTeamDto team)
@@ -124,7 +125,7 @@ namespace dogsitting_backend.ApplicationServices
             foundTeam.Calendar.UseAvailabilities = team.UseAvailabilities;
             foundTeam.Calendar.MaxWeekendDaysLodgerCount = team.MaxWeekendDaysLodgerCount;
             foundTeam.Calendar.MaxWeekDaysLodgerCount = team.MaxWeekDaysLodgerCount;
-  
+
 
             await this._teamGenericRepository.UpdateAsync(foundTeam);
 
@@ -151,7 +152,7 @@ namespace dogsitting_backend.ApplicationServices
 
             foreach (var filePositionPair in filePositionPairs)
             {
-                Media newMedia = new (filePositionPair.file);
+                Media newMedia = new(filePositionPair.file);
                 int position = filePositionPair.position;
 
                 // Replace existing image if there's one at this position, or add new one
@@ -159,7 +160,7 @@ namespace dogsitting_backend.ApplicationServices
                 {
                     await this._mediaSQLRepository.DeleteTeamMediaAsync(teamId, existingImage.MediaId);
                     await this._mediaSQLRepository.AddTeamMedia(teamId, newMedia, position);
-                    
+
                 }
                 else
                 {

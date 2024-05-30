@@ -33,6 +33,8 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
+        //todo: move this in applicationUserController
+        //user/id/teams
         [HttpGet("user/{UserId}")]
         [AllowAnonymous]
         public ActionResult GetUserTeams([FromRoute] Guid UserId)
@@ -70,10 +72,8 @@ namespace dogsitting_backend.Controllers
             return Ok();
         }
 
-        [HttpPost]
-        [Authorize(Policy = "PolpicyAdmin")]
-        [Route("create")]
-        public async Task<ActionResult> Create([FromBody] Team team)
+        [HttpPost("create")]
+        public async Task<ActionResult> Create([FromBody] CreateTeamDto team)
         {
             await this.teamService.CreateTeamAsync(team);
 

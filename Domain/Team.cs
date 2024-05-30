@@ -1,4 +1,5 @@
-﻿using dogsitting_backend.Domain.calendar;
+﻿using dogsitting_backend.ApplicationServices.dto;
+using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Domain.media;
 using dogsitting_backend.Domain.Utils;
 
@@ -9,7 +10,7 @@ namespace dogsitting_backend.Domain
         public string Name { get; set; }
         public string NormalizedName { get; set; }
 
-        public DateTime? ApprovedAt { get; set;}
+        public DateTime? ApprovedAt { get; set; }
 
         public DateTime? CreatedAt { get; set; }
 
@@ -20,6 +21,11 @@ namespace dogsitting_backend.Domain
         public Team()
         {
             this.Name = "team name";
+        }
+
+        public Team(CreateTeamDto team)
+        {
+            this.Name = team.Name;
         }
 
         public Team(string name)
