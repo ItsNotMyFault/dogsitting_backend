@@ -77,6 +77,22 @@ CREATE TABLE Availabilities (
 	CONSTRAINT fk_calendars_CalendarId FOREIGN KEY (CalendarId) REFERENCES Calendars(id)
 );
 
+CREATE TABLE Animals (
+    Id varchar(255) PRIMARY KEY,
+    Name varchar(255),
+    Species varchar(255),
+    Breed varchar(255),
+	Gender ENUM('Male', 'Female', 'Unknown'),
+    WeightKg DECIMAL(5, 2),
+    Birthdate datetime NULL,
+	Notes TEXT,
+	UserId varchar(255),
+	CreatedAt datetime NULL,
+	CONSTRAINT fk_animalusers_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
+);
+
+select * from animals;
+
 select * from medias;
 select * from teammedias;
 #SET SQL_SAFE_UPDATES = 1;
@@ -184,7 +200,7 @@ CREATE TABLE Teams (
 
 ALTER TABLE teams ADD COLUMN CreatedAt datetime null;
 
-ALTER TABLE reservations ADD COLUMN Notes varchar(3000) null;
+ALTER TABLE reservations MODIFY COLUMN Notes text null;
 
 select * from reservations;
 delete from reservations where calendarId = '2e731e68-f682-11ee-a26a-00155dd4f30d';
@@ -239,7 +255,7 @@ CREATE TABLE Reservations (
     lodgerCount integer,
     userId varchar(255),
     calendarId varchar(255),
-    notes varchar(6000),
+    notes text NULL,
 	CreatedAt datetime NULL,
     ApprovedAt datetime NULL,
     CONSTRAINT fk_reservations_userId FOREIGN KEY (userId) REFERENCES users(id),
