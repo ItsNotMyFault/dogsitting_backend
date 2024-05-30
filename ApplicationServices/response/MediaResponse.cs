@@ -4,6 +4,7 @@ namespace dogsitting_backend.ApplicationServices.response
 {
     public class MediaResponse
     {
+        public Guid Id { get; set; }
         public string FileName { get; set; }
         public string FileType { get; set; }
         public long FileSize { get; set; }
@@ -12,6 +13,7 @@ namespace dogsitting_backend.ApplicationServices.response
 
         public MediaResponse(Media media)
         {
+            this.Id = media.Id;
             this.FileName = media.FileName;
             this.FileType = media.FileType;
             this.FileSize = media.FileSize;

@@ -102,7 +102,7 @@ namespace dogsitting_backend.Controllers
             return Ok(json);
         }
 
-        [HttpPost("{Id}/media", Name = "AddMedia")]
+        [HttpPost("{Id}/media", Name = "AddReservationMedia")]
         public async Task<ActionResult> AddMedia([FromRoute] Guid Id)
         {
             List<IFormFile> files = Request.Form.Files.ToList();
@@ -110,11 +110,11 @@ namespace dogsitting_backend.Controllers
             return Ok();
         }
 
-        [HttpDelete("{Id}/media", Name = "RemoveMedia")]
-        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> fileIds)
+        [HttpDelete("{id}/media/{fileId}", Name = "RemoveReservationMedia")]
+        public async Task<ActionResult> RemoveMedia([FromRoute] Guid id, [FromRoute] Guid fileId)
         {
 
-            await this.ReservationService.RemoveMediaFromReservation(fileIds);
+            await this.ReservationService.RemoveMediaFromReservation(id, fileId);
             return Ok();
         }
 

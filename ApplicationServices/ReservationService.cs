@@ -128,12 +128,10 @@ namespace dogsitting_backend.ApplicationServices
             }
         }
 
-        public async Task RemoveMediaFromReservation(IEnumerable<Guid> mediaIds)
+        public async Task RemoveMediaFromReservation(Guid reservationId, Guid mediaId)
         {
-            foreach (Guid mediaId in mediaIds)
-            {
-                await this.ReservationSQLRepository.UnlinkMediaAsync(mediaId);
-            }
+
+            await this.ReservationSQLRepository.UnlinkMediaAsync(reservationId, mediaId);
         }
 
 

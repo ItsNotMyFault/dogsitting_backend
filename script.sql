@@ -77,6 +77,11 @@ CREATE TABLE Availabilities (
 	CONSTRAINT fk_calendars_CalendarId FOREIGN KEY (CalendarId) REFERENCES Calendars(id)
 );
 
+select * from medias;
+select * from teammedias;
+#SET SQL_SAFE_UPDATES = 1;
+delete from medias where FileType = 'image/jpeg';
+
 CREATE TABLE medias (
     Id varchar(255) PRIMARY KEY,
     FileName VARCHAR(255) NOT NULL,
@@ -86,30 +91,41 @@ CREATE TABLE medias (
     UploadedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE reservationmedia (
+    ReservationId varchar(255),
+    MediaId varchar(255),
+    PRIMARY KEY (ReservationId, MediaId),
+    FOREIGN KEY (ReservationId) REFERENCES reservations(Id) ON DELETE CASCADE,
+    FOREIGN KEY (MediaId) REFERENCES medias(Id) ON DELETE CASCADE
+);
+
+
 CREATE TABLE teammedia (
     TeamId varchar(255),
     MediaId varchar(255),
+    position INT null,
     PRIMARY KEY (TeamId, MediaId),
     FOREIGN KEY (TeamId) REFERENCES teams(Id) ON DELETE CASCADE,
-    FOREIGN KEY (MediaId) REFERENCES media(Id) ON DELETE CASCADE
+    FOREIGN KEY (MediaId) REFERENCES medias(Id) ON DELETE CASCADE
 );
+
+ALTER TABLE teammedia ADD COLUMN position INT(11) null;
+
+select * from teammedia;
 
 CREATE TABLE usermedia (
     UserId varchar(255),
     MediaId varchar(255),
     PRIMARY KEY (UserId, MediaId ),
     FOREIGN KEY (UserId) REFERENCES users(Id) ON DELETE CASCADE,
-    FOREIGN KEY (MediaId ) REFERENCES media(Id) ON DELETE CASCADE
+    FOREIGN KEY (MediaId ) REFERENCES medias(Id) ON DELETE CASCADE
 );
 
-CREATE TABLE reservationmedia (
-    ReservationId varchar(255),
-    MediaId varchar(255),
-    PRIMARY KEY (ReservationId, MediaId),
-    FOREIGN KEY (ReservationId) REFERENCES reservations(Id) ON DELETE CASCADE,
-    FOREIGN KEY (MediaId) REFERENCES media(Id) ON DELETE CASCADE
-);
+select * from medias;
+select * from teammedia;
 
+
+select * from reservationmedia;
 
 
 select * from Availabilities;
@@ -146,6 +162,8 @@ CREATE TABLE UserTokens (
 	PRIMARY KEY (UserId, LoginProvider, Name),
 	CONSTRAINT fk_UserTokens_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
 );
+
+select * from reservationmedia;
 
 select * from teams;
 delete from teams where id  = '08dc5fb2-12c8-47d3-8453-934b4b0fb586';

@@ -11,5 +11,7 @@ namespace dogsitting_backend.Domain.media
 
         public Guid MediaId { get; set; }
         public Media Media { get; set; }
+
+        public int Position{ get; set; }
     }
 }

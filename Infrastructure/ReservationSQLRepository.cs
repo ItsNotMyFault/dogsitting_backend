@@ -65,7 +65,7 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<List<ReservationMedia>> GetMedias(Guid reservationId)
         {
-            return await this.Context.ReservationMedia.Where(reservMedia => reservMedia.ReservationId == reservationId).Include(resr => resr.Reservation).ToListAsync();
+            return await this.Context.ReservationMedia.Where(reservMedia => reservMedia.ReservationId == reservationId).Include(resr => resr.Media).ToListAsync();
         }
         public async Task LinkMediaAsync(Guid reservationId, Media media)
         {
@@ -86,9 +86,9 @@ namespace dogsitting_backend.Infrastructure
         }
 
 
-        public async Task UnlinkMediaAsync(Guid mediaId)
+        public async Task UnlinkMediaAsync(Guid reservationId, Guid mediaId)
         {
-            await MediaRepository.DeleteMediaAsync(mediaId);
+            await MediaRepository.DeleteReservationMediaAsync(reservationId,mediaId);
         }
     }
 }

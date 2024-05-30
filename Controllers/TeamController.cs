@@ -24,9 +24,12 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public ActionResult GetTeams()
         {
-            List<Team> teams = this.teamService.GetTeamsWithAdmins().Result.ToList();
-            string json = JsonConvert.SerializeObject(teams);
-
+            List<TeamResponse> teams = this.teamService.GetTeamsWithMedias().Result.ToList();
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(teams, settings);
             return Ok(json);
         }
 
@@ -67,16 +70,54 @@ namespace dogsitting_backend.Controllers
             return Ok();
         }
 
-
-
         [HttpPost]
-        [Authorize(Policy = "PolicyAdmin")]
+        [Authorize(Policy = "PolpicyAdmin")]
         [Route("create")]
         public async Task<ActionResult> Create([FromBody] Team team)
         {
             await this.teamService.CreateTeamAsync(team);
 
             return Ok(JsonConvert.SerializeObject(team));
+        }
+
+        [HttpGet("{Id}/media")]
+        public async Task<ActionResult> GetTeamMedias([FromRoute] Guid Id)
+        {
+            List<TeamMediaResponse> mediaresponses = await this.teamService.GetTeamMedias(Id);
+            if(mediaresponses.Count > 4)
+            {
+                throw new Exception("Too Many pictures shouldn't happen.");
+            }
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(mediaresponses, settings);
+            return Ok(json);
+        }
+
+        [HttpPost("{Id}/media", Name = "AddTeamMedia")]
+        public async Task<ActionResult> AddMedia([FromRoute] Guid Id)
+        {
+            List<IFormFile> files = Request.Form.Files.ToList();
+            var positions = Request.Form["positions"].Select(p => int.Parse(p)).ToList();
+            if (files.Count > 4)
+            {
+                throw new Exception("Too many files.");
+            }
+            var filePositionPairs = files.Zip(positions, (file, position) => (file, position)).ToList();
+
+            await this.teamService.UpdateTeamMedia(Id, filePositionPairs);
+            return Ok();
+        }
+
+        [HttpDelete("{Id}/media", Name = "RemoveTeamMedia")]
+        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> fileIds)
+        {
+
+            await this.teamService.RemoveMediaFromReservation(fileIds);
+            return Ok();
         }
     }
 }

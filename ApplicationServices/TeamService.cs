@@ -3,6 +3,7 @@ using dogsitting_backend.ApplicationServices.response;
 using dogsitting_backend.Domain;
 using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
+using dogsitting_backend.Domain.media;
 using dogsitting_backend.Domain.Utils;
 using dogsitting_backend.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,7 @@ namespace dogsitting_backend.ApplicationServices
         private readonly IGenericRepository<Team> _teamGenericRepository;
         private readonly IGenericRepository<Calendar> _calendarGenericSQLRepository;
         private readonly TeamSQLRepository _teamSQLRepository;
+        private readonly MediaSQLRepository _mediaSQLRepository;
         private readonly CalendarSQLRepository _calendarSQLRepository;
         private readonly UserManager<AuthUser> _userManager;
         private readonly AuthService _userService;
@@ -26,7 +28,8 @@ namespace dogsitting_backend.ApplicationServices
         public TeamService(
             IGenericRepository<Team> teamGenereicRepository,
             TeamSQLRepository teamSQLRepository,
-            CalendarSQLRepository calendarSQLRepository,
+            MediaSQLRepository mediaSQLRepository,
+        CalendarSQLRepository calendarSQLRepository,
             CalendarService calendarService,
             IGenericRepository<Calendar> calendarGenericSQLRepository,
             IHttpContextAccessor httpContextAccessor,
@@ -34,6 +37,7 @@ namespace dogsitting_backend.ApplicationServices
              AuthService userService
             )
         {
+            this._mediaSQLRepository = mediaSQLRepository;
             this._calendarService = calendarService;
             _teamGenericRepository = teamGenereicRepository;
             _calendarGenericSQLRepository = calendarGenericSQLRepository;
@@ -55,7 +59,7 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<TeamResponse> GetTeamById(Guid id)
         {
-            Team team = await _teamSQLRepository.GetTeamById(id);
+            Team team = await _teamSQLRepository.GetByIdAsync(id);
             return new TeamResponse(team);
         }
 
@@ -67,6 +71,18 @@ namespace dogsitting_backend.ApplicationServices
         public async Task<IEnumerable<Team>> GetTeamsWithAdmins()
         {
             return await _teamSQLRepository.GetAllTeamsAsync();
+        }
+
+        public async Task<IEnumerable<TeamResponse>> GetTeamsWithMedias()
+        {
+            List<TeamResponse> teamResponses = [];
+            List<Team> teams = await _teamSQLRepository.GetAllTeamsWithMediaAsync();
+            foreach (Team team in teams)
+            {
+                List<TeamMediaResponse> teamMediaResponses = await this.GetTeamMedias(team.Id);
+                teamResponses.Add(new TeamResponse(team, teamMediaResponses));
+            }
+            return teamResponses;
         }
 
         public async Task<Team> CreateTeamAsync(Team team)
@@ -96,7 +112,7 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<Team> UpdateTeamAsync(Guid id, UpdateTeamDto team)
         {
-            Team foundTeam = await this._teamSQLRepository.GetTeamById(id);
+            Team foundTeam = await this._teamSQLRepository.GetByIdAsync(id);
             if (foundTeam == null)
             {
                 throw new Exception("No team found");
@@ -113,6 +129,52 @@ namespace dogsitting_backend.ApplicationServices
             await this._teamGenericRepository.UpdateAsync(foundTeam);
 
             return foundTeam;
+        }
+
+        public async Task<List<TeamMediaResponse>> GetTeamMedias(Guid teamId)
+        {
+            List<TeamMedia> teamMedias = await this._mediaSQLRepository.GetTeamMedias(teamId);
+            return teamMedias.Select(x => new TeamMediaResponse(x.Media, x.Position)).ToList();
+        }
+
+        public async Task<List<MediaResponse>> UpdateTeamMedia(Guid teamId, List<(IFormFile file, int position)> filePositionPairs)
+        {
+            Team team = await this._teamSQLRepository.GetByIdAsync(teamId);
+            if (team == null)
+            {
+                throw new Exception("Reservation not found.");
+            }
+            List<TeamMedia> exisitngMedias = await this._mediaSQLRepository.GetTeamMedias(teamId);
+
+
+            Dictionary<int, TeamMedia> existingImagesDict = exisitngMedias.ToDictionary(img => img.Position);
+
+            foreach (var filePositionPair in filePositionPairs)
+            {
+                Media newMedia = new (filePositionPair.file);
+                int position = filePositionPair.position;
+
+                // Replace existing image if there's one at this position, or add new one
+                if (existingImagesDict.TryGetValue(position, out TeamMedia existingImage))
+                {
+                    await this._mediaSQLRepository.DeleteTeamMediaAsync(teamId, existingImage.MediaId);
+                    await this._mediaSQLRepository.AddTeamMedia(teamId, newMedia, position);
+                    
+                }
+                else
+                {
+                    await this._mediaSQLRepository.AddTeamMedia(teamId, newMedia, position);
+                }
+            }
+            return [];
+        }
+
+        public async Task RemoveMediaFromReservation(IEnumerable<Guid> mediaIds)
+        {
+            foreach (Guid mediaId in mediaIds)
+            {
+                //await this._teamSQLRepository.UnlinkMediaAsync(mediaId);
+            }
         }
 
     }
