@@ -38,7 +38,7 @@ namespace dogsitting_backend.Controllers
         [HttpGet("{id}/animals")]
         public ActionResult Animals([FromRoute] Guid id)
         {
-            List<Animal> animals = this._animalService.GetAnimalsByUserId(id).Result;
+            List<AnimalResponse> animals = this._animalService.GetAnimalsByUserId(id).Result;
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,

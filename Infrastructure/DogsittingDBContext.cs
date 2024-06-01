@@ -75,6 +75,7 @@ namespace dogsitting_backend.Infrastructure
 
         private void MediaBuilder(ModelBuilder modelBuilder)
         {
+            //reservation media
             modelBuilder.Entity<ReservationMedia>()
             .HasKey(rm => new { rm.ReservationId, rm.MediaId });
 
@@ -87,7 +88,7 @@ namespace dogsitting_backend.Infrastructure
                 .HasOne(rm => rm.Media)
                 .WithMany(m => m.ReservationMedias)
                 .HasForeignKey(rm => rm.MediaId);
-
+            //team media
             modelBuilder.Entity<TeamMedia>()
                 .HasKey(tm => new { tm.TeamId, tm.MediaId });
 
@@ -100,7 +101,7 @@ namespace dogsitting_backend.Infrastructure
                 .HasOne(tm => tm.Media)
                 .WithMany(m => m.TeamMedias)
                 .HasForeignKey(tm => tm.MediaId);
-
+            //user Media
             modelBuilder.Entity<UserMedia>()
                 .HasKey(um => new { um.UserId, um.MediaId });
 

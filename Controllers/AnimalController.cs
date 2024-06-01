@@ -2,10 +2,14 @@
 using dogsitting_backend.ApplicationServices.dto;
 using dogsitting_backend.ApplicationServices.response;
 using dogsitting_backend.Domain;
+using dogsitting_backend.Domain.auth;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Utilities.IO;
+using System.Security.Claims;
 
 namespace dogsitting_backend.Controllers
 {
@@ -15,15 +19,19 @@ namespace dogsitting_backend.Controllers
     public class AnimalController : ControllerBase
     {
         private AnimalService AnimalService;
-        public AnimalController(AnimalService animalService)
+        private AuthUser _authUser;
+
+        public AnimalController(AnimalService animalService, IHttpContextAccessor httpContextAccessor, UserManager<AuthUser> userManager)
         {
             this.AnimalService = animalService;
+            ClaimsPrincipal claimsPrincipal = httpContextAccessor.HttpContext.User;
+            this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult> Details([FromRoute] Guid id)
         {
-            Animal animal = await this.AnimalService.GetAnimal(id);
+            AnimalResponse animal = await this.AnimalService.GetAnimalById(id);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
@@ -48,10 +56,10 @@ namespace dogsitting_backend.Controllers
 
         [HttpPost("create")]
         [AllowAnonymous]
-        public async Task<ActionResult> Create([FromBody] CreateAnimalDto animal)
+        public async Task<ActionResult> Create([FromForm] CreateAnimalDto animal)
         {
-            var test = HttpContext.User.Claims;
-            await this.AnimalService.CreateAnimal(animal);
+            IFormFile? file = Request.Form.Files.FirstOrDefault();
+            await this.AnimalService.CreateUserAnimal(animal, file, this._authUser.ApplicationUser.Id);
             return Ok();
         }
 
@@ -60,6 +68,22 @@ namespace dogsitting_backend.Controllers
         public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] Animal animal)
         {
             await this.AnimalService.UpdateAnimal(id, animal);
+            return Ok();
+        }
+
+
+        [HttpPost("{Id}/media", Name = "UpdateMedia")]
+        public async Task<ActionResult> UpdateMedia([FromRoute] Guid Id)
+        {
+            IFormFile? file = Request.Form.Files.FirstOrDefault();
+            if(file != null)
+            {
+                await this.AnimalService.UpdateAnimalMedia(Id, file);
+            }
+            else
+            {
+                await this.AnimalService.DeleteAnimalMedia(Id);
+            }
             return Ok();
         }
 

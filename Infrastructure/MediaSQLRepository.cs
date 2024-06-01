@@ -25,13 +25,13 @@ namespace dogsitting_backend.Infrastructure
             await Context.SaveChangesAsync();
         }
 
-        public async Task AddTeamMediaAsync(TeamMedia media)
+        private async Task AddTeamMediaAsync(TeamMedia media)
         {
             Context.TeamMedia.Add(media);
             await Context.SaveChangesAsync();
         }
 
-        public async Task AddUserMediaAsync(UserMedia media)
+        private async Task AddUserMediaAsync(UserMedia media)
         {
             Context.UserMedia.Add(media);
             await Context.SaveChangesAsync();
@@ -96,7 +96,7 @@ namespace dogsitting_backend.Infrastructure
                 TeamId = teamId,
                 MediaId = media.Id,
                 Position = position
-                
+
             };
 
             await this.AddTeamMediaAsync(teamMedia);
@@ -111,10 +111,9 @@ namespace dogsitting_backend.Infrastructure
             await Context.SaveChangesAsync();
         }
 
-        public async Task DeleteMediaAsync(Guid mediaId)
+        public async Task DeleteMediaAsync(Guid? mediaId)
         {
-            Media media= await Context.Medias.FindAsync(mediaId);
-
+            Media media = await Context.Medias.FindAsync(mediaId);
             Context.Medias.Remove(media);
             await Context.SaveChangesAsync();
         }

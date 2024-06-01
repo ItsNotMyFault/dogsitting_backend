@@ -87,11 +87,21 @@ CREATE TABLE Animals (
     Birthdate datetime NULL,
 	Notes TEXT,
 	UserId varchar(255),
+    MediaId varchar(255) NULL,
 	CreatedAt datetime NULL,
-	CONSTRAINT fk_animalusers_UserId FOREIGN KEY (UserId) REFERENCES Users(id)
+	CONSTRAINT fk_animalusers_UserId FOREIGN KEY (UserId) REFERENCES Users(id),
+    CONSTRAINT fk_animalmedias_MediaId FOREIGN KEY (MediaId) REFERENCES Medias(id)
 );
 
 select * from animals;
+
+CREATE TABLE animalmedia (
+    AnimalId varchar(255),
+    MediaId varchar(255),
+    PRIMARY KEY (AnimalId, MediaId ),
+    FOREIGN KEY (AnimalId) REFERENCES Animals(Id) ON DELETE CASCADE,
+    FOREIGN KEY (MediaId ) REFERENCES medias(Id) ON DELETE CASCADE
+);
 
 select * from medias;
 select * from teammedias;

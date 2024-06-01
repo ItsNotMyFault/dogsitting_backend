@@ -111,13 +111,5 @@ namespace dogsitting_backend.Controllers
             await this.teamService.UpdateTeamMedia(Id, filePositionPairs);
             return Ok();
         }
-
-        [HttpDelete("{Id}/media", Name = "RemoveTeamMedia")]
-        public async Task<ActionResult> RemoveMedia([FromBody] IEnumerable<Guid> fileIds)
-        {
-
-            await this.teamService.RemoveMediaFromReservation(fileIds);
-            return Ok();
-        }
     }
 }

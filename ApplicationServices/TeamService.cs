@@ -17,33 +17,20 @@ namespace dogsitting_backend.ApplicationServices
     public class TeamService
     {
         private readonly IGenericRepository<Team> _teamGenericRepository;
-        private readonly IGenericRepository<Calendar> _calendarGenericSQLRepository;
         private readonly TeamSQLRepository _teamSQLRepository;
         private readonly MediaSQLRepository _mediaSQLRepository;
-        private readonly CalendarSQLRepository _calendarSQLRepository;
-        private readonly UserManager<AuthUser> _userManager;
         private readonly AuthService _userService;
-        private readonly CalendarService _calendarService;
 
         public TeamService(
             IGenericRepository<Team> teamGenereicRepository,
             TeamSQLRepository teamSQLRepository,
             MediaSQLRepository mediaSQLRepository,
-        CalendarSQLRepository calendarSQLRepository,
-            CalendarService calendarService,
-            IGenericRepository<Calendar> calendarGenericSQLRepository,
-            IHttpContextAccessor httpContextAccessor,
-            UserManager<AuthUser> userManager,
              AuthService userService
             )
         {
             this._mediaSQLRepository = mediaSQLRepository;
-            this._calendarService = calendarService;
             _teamGenericRepository = teamGenereicRepository;
-            _calendarGenericSQLRepository = calendarGenericSQLRepository;
             _teamSQLRepository = teamSQLRepository;
-            _calendarSQLRepository = calendarSQLRepository;
-            _userManager = userManager;
             this._userService = userService;
         }
 
@@ -160,7 +147,6 @@ namespace dogsitting_backend.ApplicationServices
                 {
                     await this._mediaSQLRepository.DeleteTeamMediaAsync(teamId, existingImage.MediaId);
                     await this._mediaSQLRepository.AddTeamMedia(teamId, newMedia, position);
-
                 }
                 else
                 {
@@ -169,14 +155,5 @@ namespace dogsitting_backend.ApplicationServices
             }
             return [];
         }
-
-        public async Task RemoveMediaFromReservation(IEnumerable<Guid> mediaIds)
-        {
-            foreach (Guid mediaId in mediaIds)
-            {
-                //await this._teamSQLRepository.UnlinkMediaAsync(mediaId);
-            }
-        }
-
     }
 }

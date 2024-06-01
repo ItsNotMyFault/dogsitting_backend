@@ -26,12 +26,12 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<List<Animal>> GetUserAnimalsAsync(Guid userId)
         {
-            return await this.Context.Animals.Include(animal => animal.User).Where(animal => animal.User.Id == userId).ToListAsync();
+            return await this.Context.Animals.Where(animal => animal.User.Id == userId).Include(animal => animal.User).Include(animal => animal.Media).ToListAsync();
         }
 
-        public async Task<Animal> GetAnimalAsync(Guid animalId)
+        public async Task<Animal> GetById(Guid animalId)
         {
-            return await this.Context.Animals.FindAsync(animalId);
+            return await this.Context.Animals.Where(animal => animal.Id == animalId).Include(animal => animal.Media).FirstAsync();
         }
 
         public async Task<Animal> Create(Animal animal)
