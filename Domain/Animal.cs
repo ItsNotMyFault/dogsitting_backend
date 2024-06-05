@@ -24,6 +24,11 @@ namespace dogsitting_backend.Domain
 
         public Animal(CreateAnimalDto createAnimalDto, Guid userId)
         {
+            this.Update(createAnimalDto, userId);
+        }
+
+        public void Update(CreateAnimalDto createAnimalDto, Guid userId)
+        {
             this.Name = createAnimalDto.Name;
             this.Species = createAnimalDto.Species;
             this.Breed = createAnimalDto.Breed;
@@ -31,7 +36,7 @@ namespace dogsitting_backend.Domain
             {
                 this.Gender = (Gender)Enum.Parse(typeof(Gender), createAnimalDto.Gender, true);
             }
-            catch(Exception)
+            catch (Exception)
             {
                 this.Gender = Gender.Unknown;
             }

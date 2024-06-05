@@ -77,8 +77,14 @@ namespace dogsitting_backend.Controllers
         [HttpPost("{team}", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
-            await this.ReservationService.AddReservationToTeamCalendar(reservation, team);
-            return Ok();
+            ReservationResponse newReservation = await this.ReservationService.AddReservationToTeamCalendar(reservation, team);
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(newReservation, settings);
+            return Ok(json);
         }
 
         [HttpPost("{Id}/approve", Name = "ApproveReservation")]

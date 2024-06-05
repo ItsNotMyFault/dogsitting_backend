@@ -65,9 +65,15 @@ namespace dogsitting_backend.Controllers
 
         [HttpPut("edit/{id}")]
         [AllowAnonymous]
-        public async Task<ActionResult> Update([FromRoute] Guid id, [FromBody] Animal animal)
+        public async Task<ActionResult> Update([FromRoute] Guid id, [FromForm] CreateAnimalDto animal)
         {
-            await this.AnimalService.UpdateAnimal(id, animal);
+            IFormFile? file = Request.Form.Files.FirstOrDefault();
+            await this.AnimalService.UpdateAnimal(id, animal, this._authUser.ApplicationUser.Id);
+            if (file != null)
+            {
+                await this.AnimalService.UpdateAnimalMedia(id, file);
+            }
+
             return Ok();
         }
 
@@ -76,7 +82,7 @@ namespace dogsitting_backend.Controllers
         public async Task<ActionResult> UpdateMedia([FromRoute] Guid Id)
         {
             IFormFile? file = Request.Form.Files.FirstOrDefault();
-            if(file != null)
+            if (file != null)
             {
                 await this.AnimalService.UpdateAnimalMedia(Id, file);
             }

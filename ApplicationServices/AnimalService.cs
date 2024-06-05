@@ -42,11 +42,15 @@ namespace dogsitting_backend.ApplicationServices
             //await this.UpdateAnimalMedia(newAnimal.Id, animal.Media);
         }
 
-        public async Task UpdateAnimal(Guid animalId, Animal animal)
+        public async Task UpdateAnimal(Guid animalId, CreateAnimalDto animal, Guid userId)
         {
             Animal foundAnimal = await this.AnimalRepository.GetById(animalId);
-            animal.Id = foundAnimal.Id;
-            await AnimalRepository.Update(animal);
+            if (animal == null)
+            {
+                throw new Exception("Animal not found.");
+            }
+            foundAnimal.Update(animal, userId);
+            await AnimalRepository.Update(foundAnimal);
         }
 
         public async Task<List<Animal>> GetAnimals()
@@ -70,7 +74,6 @@ namespace dogsitting_backend.ApplicationServices
             animal.MediaId = Guid.Empty;
             animal.Media = newMedia;
             await this.AnimalRepository.Update(animal);
-            await this._mediaSQLRepository.AddMediaAsync(newMedia);
         }
 
         public async Task DeleteAnimalMedia(Guid animalId)

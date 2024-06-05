@@ -21,7 +21,7 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<Calendar> GetCalendarById(Guid id)
         {
-            return this._calendarGenereicRepository.Build().Where(c => c.Id == id).First();
+            return await this._calendarGenereicRepository.Build().Where(c => c.Id == id).FirstAsync();
         }
 
         /// <summary>

@@ -70,7 +70,7 @@ namespace dogsitting_backend.Infrastructure
             }
 );
 
-
+            base.OnModelCreating(modelBuilder);
         }
 
         private void MediaBuilder(ModelBuilder modelBuilder)
