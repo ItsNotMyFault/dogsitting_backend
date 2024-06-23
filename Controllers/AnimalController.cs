@@ -59,7 +59,7 @@ namespace dogsitting_backend.Controllers
         public async Task<ActionResult> Create([FromForm] CreateAnimalDto animal)
         {
             IFormFile? file = Request.Form.Files.FirstOrDefault();
-            await this.AnimalService.CreateUserAnimal(animal, file, this._authUser.ApplicationUser.Id);
+            await this.AnimalService.CreateUserAnimal(animal, this._authUser.ApplicationUser.Id, file);
             return Ok();
         }
 

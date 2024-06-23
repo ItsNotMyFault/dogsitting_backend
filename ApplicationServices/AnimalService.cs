@@ -20,7 +20,7 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task<AnimalResponse> GetAnimalById(Guid animalId)
         {
-            Animal animal= await AnimalRepository.GetById(animalId);
+            Animal animal = await AnimalRepository.GetById(animalId);
             return new AnimalResponse(animal);
         }
 
@@ -30,16 +30,19 @@ namespace dogsitting_backend.ApplicationServices
             return animals.Select(animal => new AnimalResponse(animal)).ToList();
         }
 
-        public async Task CreateUserAnimal(CreateAnimalDto animal, IFormFile file, Guid userId)
+        public async Task CreateUserAnimal(CreateAnimalDto animal, Guid userId, IFormFile? file)
         {
-            Media media = new Media(file);
-            await this._mediaSQLRepository.AddMediaAsync(media);
-            Animal newAnimal = new Animal(animal, userId);
-            newAnimal.Media = media;
-            newAnimal.MediaId = media.Id;
-            newAnimal.UserId = userId;
+            Animal newAnimal = new(animal, userId);
+            if (file != null)
+            {
+                Media media = new(file);
+                await this._mediaSQLRepository.AddMediaAsync(media);
+                newAnimal.Media = media;
+                newAnimal.MediaId = media.Id;
+                newAnimal.UserId = userId;
+            }
+
             await AnimalRepository.Create(newAnimal);
-            //await this.UpdateAnimalMedia(newAnimal.Id, animal.Media);
         }
 
         public async Task UpdateAnimal(Guid animalId, CreateAnimalDto animal, Guid userId)

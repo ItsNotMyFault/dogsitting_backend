@@ -18,7 +18,7 @@ namespace dogsitting_backend.Domain
         // Map DateFrom and DateTo fields to DateTimePeriod inner class
         public DateTimePeriod Period
         {
-            get => new DateTimePeriod(this.DateFrom, this.DateTo);
+            get => new(this.DateFrom, this.DateTo);
             set
             {
                 DateFrom = value.StartDate;
@@ -36,7 +36,7 @@ namespace dogsitting_backend.Domain
         //public ICollection<Media> Medias { get; set; } = new List<Media>(); //navigation property
         public ICollection<ReservationMedia> ReservationMedias { get; set; } = new List<ReservationMedia>(); //navigation property
 
-        public required int LodgerCount { get; set; } 
+        public required int LodgerCount { get; set; }
         public string? Notes { get; set; }
         public string ReservationCalendarTitle { get => $"{this.Client?.Name} ({this.LodgerCount})"; }
         public string ReservationTitle { get => $"{this.Client?.Name}"; }

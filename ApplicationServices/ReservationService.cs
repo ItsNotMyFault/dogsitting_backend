@@ -61,7 +61,7 @@ namespace dogsitting_backend.ApplicationServices
             await this.ReservationSQLRepository.UpdateAsync(reservation);
         }
 
-        public async Task<Reservation> AddReservationToTeamCalendar(ReservationDto reservationDto, string teamName)
+        public async Task<ReservationResponse> AddReservationToTeamCalendar(ReservationDto reservationDto, string teamName)
         {
             if (reservationDto == null)
             {
@@ -79,7 +79,7 @@ namespace dogsitting_backend.ApplicationServices
             Domain.calendar.Calendar calendar = await this._calendarService.GetTeamCalendar(teamName);
 
             calendar.TeamId = team.Id;
-            Reservation reservation = new Reservation(calendar)
+            Reservation reservation = new(calendar)
             {
                 UserId = user.ApplicationUser.Id,
                 Client = null,
@@ -92,7 +92,7 @@ namespace dogsitting_backend.ApplicationServices
             calendar.ValidateReservation(reservation);
 
             await this.ReservationSQLRepository.AddAsync(reservation);
-            return reservation;
+            return new ReservationResponse(reservation);
             //TODO
             //Validate calendar is available on desired period.
             //  IF NOT propose another team WHO IS. => check other teams.

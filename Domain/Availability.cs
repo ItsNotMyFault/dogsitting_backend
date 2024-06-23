@@ -14,7 +14,7 @@ namespace dogsitting_backend.Domain
 
         public DateTimePeriod Period
         {
-            get => new DateTimePeriod(this.DateFrom, this.DateTo);
+            get => new(this.DateFrom, this.DateTo);
             set
             {
                 DateFrom = value.StartDate;
