@@ -11,7 +11,8 @@ using Newtonsoft.Json;
 
 namespace dogsitting_backend.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [ApiController]
     [Authorize]
     public class ReservationController : ControllerBase
     {
@@ -74,7 +75,8 @@ namespace dogsitting_backend.Controllers
 
 
 
-        [HttpPost("{team}", Name = "CreateReservation")]
+        // [HttpPost("{team}", Name = "CreateReservation")]
+        [HttpPost("teams/{team}/reservations", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
             ReservationResponse newReservation = await this.ReservationService.AddReservationToTeamCalendar(reservation, team);
