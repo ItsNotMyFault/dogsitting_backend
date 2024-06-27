@@ -10,13 +10,15 @@ namespace dogsitting_backend.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class TeamController : ControllerBase
     {
         private TeamService teamService;
-        public TeamController(TeamService teamService)
+        private ReservationService ReservationService;
+        public TeamController(TeamService teamService, ReservationService reservationService)
         {
             this.teamService = teamService;
+            this.ReservationService = reservationService;
         }
 
 
@@ -80,11 +82,25 @@ namespace dogsitting_backend.Controllers
             return Ok(JsonConvert.SerializeObject(team));
         }
 
+        [HttpPost("{team}/reservations")]
+        public async Task<ActionResult> CreateTeamReservation([FromRoute] string team, [FromBody] ReservationDto reservation)
+        {
+            ReservationResponse newReservation = await this.ReservationService.AddReservationToTeamCalendar(reservation, team);
+
+            var settings = new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            string json = JsonConvert.SerializeObject(newReservation, settings);
+            return Ok(json);
+        }
+
+
         [HttpGet("{Id}/media")]
         public async Task<ActionResult> GetTeamMedias([FromRoute] Guid Id)
         {
             List<TeamMediaResponse> mediaresponses = await this.teamService.GetTeamMedias(Id);
-            if(mediaresponses.Count > 4)
+            if (mediaresponses.Count > 4)
             {
                 throw new Exception("Too Many pictures shouldn't happen.");
             }
