@@ -10,7 +10,8 @@ using System.Globalization;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
-builder.Services.AddControllers();
+services.AddControllers();
+services.AddSignalR();
 
 IConfigurationRoot Configuration = builder.Configuration;
 IWebHostEnvironment Environment = builder.Environment;
@@ -56,7 +57,7 @@ services.ConfigureApplicationCookie(options =>
         {
             await Task.CompletedTask;
         },
-        
+
     };
 });
 
@@ -84,13 +85,11 @@ builder.Services.AddDbContext<DogsittingDBContext>(options =>
         string connetionString = builder.Configuration.GetSection("ConnectionString:Dev:dogsitting").Value;
         options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
     }
-    catch(Exception err)
+    catch (Exception err)
     {
         var ex = err;
     }
-    
-}
-);
+});
 
 builder.Services.AddMvc();
 builder.Logging.AddConsole();
