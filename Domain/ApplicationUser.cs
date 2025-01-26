@@ -7,10 +7,8 @@ using System.Security.Principal;
 
 namespace dogsitting_backend.Domain;
 
-public class ApplicationUser
+public class ApplicationUser : DBModel
 {
-    [Key]
-    public Guid Id { get; set; }
     public ApplicationUser() { }
     public ApplicationUser(string firstName, string lastName)
     {

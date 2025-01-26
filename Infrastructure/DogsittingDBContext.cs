@@ -3,7 +3,6 @@ using dogsitting_backend.Domain.auth;
 using dogsitting_backend.Domain.calendar;
 using dogsitting_backend.Domain.media;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace dogsitting_backend.Infrastructure
 {
@@ -31,7 +30,7 @@ namespace dogsitting_backend.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            this.MediaBuilder(modelBuilder);
+            MediaBuilder(modelBuilder);
 
             modelBuilder.Entity<Calendar>().ToTable("Calendars").HasOne(x => x.Team).WithOne(x => x.Calendar);
             modelBuilder.Entity<Calendar>().ToTable("Calendars").HasMany(t => t.Reservations).WithOne(r => r.Calendar);

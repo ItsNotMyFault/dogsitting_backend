@@ -6,9 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace dogsitting_backend.Domain.calendar
 {
-    public class Calendar
+    public class Calendar : DBModel
     {
-        public Guid Id { get; set; }
         /// <summary>
         /// Allow the user to configure if he wants to enable periods or block them.
         /// Can only choose once at a time.

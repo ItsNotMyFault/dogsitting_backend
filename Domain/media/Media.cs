@@ -15,9 +15,9 @@ namespace dogsitting_backend.Domain.media
         public byte[] FileData { get; set; }
         public DateTime UploadedAt { get; set; }
 
-        public ICollection<ReservationMedia> ReservationMedias { get; set; }
-        public ICollection<TeamMedia> TeamMedias { get; set; }
-        public ICollection<UserMedia> UserMedias { get; set; }
+        public virtual ICollection<ReservationMedia> ReservationMedias { get; set; }
+        public virtual ICollection<TeamMedia> TeamMedias { get; set; }
+        public virtual ICollection<UserMedia> UserMedias { get; set; }
 
         public Media(IFormFile file)
         {

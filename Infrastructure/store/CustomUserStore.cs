@@ -243,6 +243,7 @@ namespace dogsitting_backend.Infrastructure.store
 
         public Task<AuthUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
+            // TODO...
             throw new NotImplementedException();
         }
 

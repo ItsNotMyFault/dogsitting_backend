@@ -6,12 +6,21 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Globalization;
+using System.Diagnostics;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 services.AddControllers();
 services.AddSignalR();
+
+var res = Debugger.Launch();
+Console.WriteLine($"=========DEBUGGER {res}=========");
+if (!res)
+{
+    Console.WriteLine($"=========DEBUGGER {res}=========");
+}
+Console.WriteLine($"=========WAIT OVER {Debugger.IsAttached}=========");
 
 IConfigurationRoot Configuration = builder.Configuration;
 IWebHostEnvironment Environment = builder.Environment;
@@ -124,13 +133,13 @@ app.UseDeveloperExceptionPage();
 app.UseCors("AllowLocalhost4000");
 
 app.UseHttpsRedirection();
-app.UseCookiePolicy();
 
 app.UseMiddleware<ErrorHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 
-app.UseSession();
+app.UseCookiePolicy();
+app.UseSession();//has to be before useauthentication
 app.UseAuthentication();
 app.UseAuthorization();
 

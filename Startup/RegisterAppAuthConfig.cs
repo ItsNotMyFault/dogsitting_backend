@@ -59,29 +59,44 @@ namespace dogsitting_backend.Startup
                 {
                     OnAccessDenied = async context =>
                     {
+                        Console.WriteLine($"=========OnAccessDenied=========");
                         await Task.CompletedTask;
                     },
                     OnCreatingTicket = async context =>
                     {
+                        Console.WriteLine($"=========OnCreatingTicket=========");
+                        var accessToken = context.AccessToken; // Use direct access token
+                        Console.WriteLine("accessToken");
+                        Console.WriteLine(accessToken);
                         OAuthTokenResponse tokenResponse = context.TokenResponse;
-                        string serializedAccessToken = JsonConvert.SerializeObject(tokenResponse);
+                        Console.WriteLine("tokenResponse");
+                        Console.WriteLine(tokenResponse);
 
-                        context.HttpContext.Session.SetString("facebook_accesstoken", serializedAccessToken);
+                        context.HttpContext.Session.SetString("facebook_accesstoken", JsonConvert.SerializeObject(accessToken));
+                        context.HttpContext.Session.SetString("facebook_tokenResponse", JsonConvert.SerializeObject(tokenResponse));
+                        Console.WriteLine($"=========facebook_accesstoken=========");
+                        var getToken = context.HttpContext.Session.Get("facebook_accesstoken");
+                        Console.WriteLine("getToken");
+                        Console.WriteLine(getToken);
+
                         await Task.CompletedTask;
                     },
                     OnRedirectToAuthorizationEndpoint = async context =>
                     {
+                        Console.WriteLine($"=========OnRedirectToAuthorizationEndpoint=========");
                         context.HttpContext.Response.Redirect(context.RedirectUri);
                         await Task.CompletedTask;
                     },
                     OnRemoteFailure = async context =>
                     {
+                        Console.WriteLine($"=========OnRemoteFailure=========");
                         var errorMessage = context.Failure.Message;
                         context.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
                         await Task.CompletedTask;
                     },
                     OnTicketReceived = async context =>
                     {
+                        Console.WriteLine($"=========OnTicketReceived=========");
                         await Task.CompletedTask;
                     },
                 };

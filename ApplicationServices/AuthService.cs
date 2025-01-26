@@ -1,6 +1,7 @@
 ﻿using dogsitting_backend.Domain.auth;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics;
 using System.Security.Claims;
 
 namespace dogsitting_backend.ApplicationServices
@@ -11,8 +12,8 @@ namespace dogsitting_backend.ApplicationServices
         private readonly SignInManager<AuthUser> _signInManager;
         private readonly ClaimsPrincipal claimsPrincipal;
         public AuthService(
-            UserManager<AuthUser> userManager, 
-            SignInManager<AuthUser> signInManager, 
+            UserManager<AuthUser> userManager,
+            SignInManager<AuthUser> signInManager,
             IHttpContextAccessor httpContextAccessor
             )
         {
@@ -31,26 +32,29 @@ namespace dogsitting_backend.ApplicationServices
 
         public async Task Signout()
         {
-             await this._signInManager.SignOutAsync();
+            await this._signInManager.SignOutAsync();
         }
 
 
         public async Task<bool> AuthenticateWithExternalProvider(ClaimsIdentity claimsIdentity, OAuthTokenResponse oAuthTokenResponse)
         {
-            if(claimsIdentity == null && oAuthTokenResponse == null)
+            if (claimsIdentity == null && oAuthTokenResponse == null)
             {
                 throw new Exception("Missing oauth token and claims");
             }
 
-            if(this.claimsPrincipal != null)
+            Debug.WriteLine("this.claimsPrincipal----------------");
+            Debug.WriteLine(this.claimsPrincipal);
+            Debug.WriteLine(claimsIdentity);
+            if (this.claimsPrincipal != null)
             {
                 AuthUser user = await this._userManager.GetUserAsync(this.claimsPrincipal);
-                if(user != null)
+                if (user != null)
                 {
                     return true;
                 }
             }
-            
+
 
             string loginProvider = claimsIdentity.AuthenticationType;
             string providerkey = claimsIdentity.Claims.FirstOrDefault(x => x.Type.Contains("nameidentifier")).Value;
@@ -71,9 +75,16 @@ namespace dogsitting_backend.ApplicationServices
             //user exists => check UserLogin with matching provider exists
             // => if yes => use signin manager to authenticate (should add entry in usertoken).
             // => if no => AddloginProvider
+            AuthUser authenticationUser = null;
+            try
+            {
+                authenticationUser = await _userManager.FindByLoginAsync(loginProvider, providerkey);
+            }
+            catch (Exception e)
+            {
+                var err = e;
+            }
 
-
-            AuthUser authenticationUser = await _userManager.FindByLoginAsync(loginProvider, providerkey);
             if (authenticationUser != null)
             {
                 await this._signInManager.SignInAsync(authenticationUser, false);

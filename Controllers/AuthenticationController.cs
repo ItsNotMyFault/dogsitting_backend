@@ -16,6 +16,8 @@ using NuGet.Protocol;
 using System.Text.Json;
 using Humanizer;
 
+
+
 namespace dogsitting_backend.Controllers
 {
     [AllowAnonymous]
@@ -28,10 +30,15 @@ namespace dogsitting_backend.Controllers
 
         public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService authService, UserManager<AuthUser> userManager)
         {
+            Console.WriteLine($"=========AuthenticationController=========");
             this.httpContextAccessor = httpContextAccessor;
-            this.claimsPrincipal = httpContextAccessor.HttpContext.User;
+            claimsPrincipal = httpContextAccessor.HttpContext.User;
+            Console.WriteLine(httpContextAccessor);
+            Console.WriteLine(httpContextAccessor.HttpContext.User);
             _authUser = userManager.GetUserAsync(claimsPrincipal).Result;
-            this._authService = authService;
+            Console.WriteLine("_authUser");
+            Console.WriteLine(_authUser);
+            _authService = authService;
 
         }
 
@@ -39,7 +46,7 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public IActionResult GetLoggedInUser()
         {
-            if (this._authUser == null)
+            if (_authUser == null)
             {
                 throw new Exception("not authentified");
             }
@@ -48,22 +55,12 @@ namespace dogsitting_backend.Controllers
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
 
-            string json = JsonConvert.SerializeObject(this._authUser.ApplicationUser, settings);
+            string json = JsonConvert.SerializeObject(_authUser.ApplicationUser, settings);
             return Ok(json);
         }
 
-        public int Quantity { get => this.Quantity; set => this.SetQuantity(value);}
-        public int SetQuantity(int value)
-        {
-            if(value < 1)
-            {
-                this.Quantity = 1;
-            }
-            return value;
-        }
 
-
-            [HttpGet("login")]
+        [HttpGet("login")]
         [AllowAnonymous]
         public IActionResult FacebookLogin()
         {
@@ -81,7 +78,11 @@ namespace dogsitting_backend.Controllers
         {
             AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
 
-
+            Console.WriteLine($"=========FacebookLoginCallback=========");
+            Console.WriteLine(authenticateResult.Ticket);
+            Console.WriteLine(authenticateResult.Succeeded);
+            Console.WriteLine(HttpContext.Session);
+            Console.WriteLine(authenticateResult.Principal);
             if (!authenticateResult.Succeeded)
             {
                 // Handle authentication failure
@@ -90,8 +91,13 @@ namespace dogsitting_backend.Controllers
             ClaimsPrincipal claimsPrincipal = authenticateResult.Principal;
             ClaimsIdentity claimsIdentity = claimsPrincipal.Identity as ClaimsIdentity;
             string serializedAccessToken = HttpContext.Session.GetString("facebook_accesstoken");
-            OAuthTokenResponse tokenResponse = this.RetrieveTokenResponseFromString(serializedAccessToken);
-            this._authService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
+            string serializedTokenResponse = HttpContext.Session.GetString("facebook_tokenResponse");
+            Console.WriteLine("--------------------------");
+            Console.WriteLine(serializedAccessToken);
+            Console.WriteLine("--------------------------");
+            Console.WriteLine(serializedTokenResponse);
+            OAuthTokenResponse tokenResponse = RetrieveTokenResponseFromString(serializedTokenResponse);
+            await _authService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
 
             return RedirectToAction(nameof(Home));
         }
@@ -99,10 +105,14 @@ namespace dogsitting_backend.Controllers
         private OAuthTokenResponse RetrieveTokenResponseFromString(string serializedAccessToken)
         {
             JsonDocument jsonDocument = JsonDocument.Parse(serializedAccessToken);
+            Console.WriteLine(jsonDocument);
             OAuthTokenResponse tokenResponse = OAuthTokenResponse.Success(jsonDocument);
+            Console.WriteLine(tokenResponse);
 
             // Extract values from JsonDocument
             string accessToken = jsonDocument.RootElement.GetProperty("AccessToken").GetString();
+            Console.WriteLine("BROOOOOOOOOOOOO");
+            Console.WriteLine(accessToken);
             string tokenType = jsonDocument.RootElement.GetProperty("TokenType").GetString();
             string refreshToken = jsonDocument.RootElement.GetProperty("RefreshToken").GetString();
             string expiresIn = jsonDocument.RootElement.GetProperty("ExpiresIn").GetString();
@@ -110,6 +120,7 @@ namespace dogsitting_backend.Controllers
             tokenResponse.TokenType = tokenType;
             tokenResponse.ExpiresIn = expiresIn;
             tokenResponse.RefreshToken = refreshToken;
+            Console.WriteLine(tokenResponse);
             return tokenResponse;
         }
 
@@ -117,14 +128,14 @@ namespace dogsitting_backend.Controllers
         [HttpGet("accessdenied")]
         public void Accessdenied()
         {
-            this.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
+            HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
         }
 
         [AllowAnonymous]
         [HttpGet("home")]
         public void Home()
         {
-            this.HttpContext.Response.Redirect("https://localhost:4000/");
+            HttpContext.Response.Redirect("https://localhost:4000/");
         }
 
 
@@ -159,9 +170,9 @@ namespace dogsitting_backend.Controllers
         [Route("LogOff")]
         public async Task<IActionResult> LogOff()
         {
-            await this._authService.Signout();
-            
-            this.HttpContext.Response.Redirect("https://localhost:4000/home");
+            await _authService.Signout();
+
+            HttpContext.Response.Redirect("https://localhost:4000/home");
             return Ok("success");
         }
 

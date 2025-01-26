@@ -1,26 +1,26 @@
 {
-  "profiles": {
-    "WSL": {
-      "commandName": "WSL2",
-      "launchBrowser": true,
-      "launchUrl": "http://localhost:4000",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://localhost:5188"
-      },
-      "distributionName": ""
-    },
-    "project:DEV": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "authuser",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "https://localhost:5188"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "https://localhost:5188"
-    }
-  },
-  "$schema": "http://json.schemastore.org/launchsettings.json"
+	"profiles": {
+		"WSL": {
+			"commandName": "WSL2",
+			"launchBrowser": true,
+			"launchUrl": "http://localhost:4000",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"ASPNETCORE_URLS": "http://localhost:5188"
+			},
+			"distributionName": ""
+		},
+		"project:DEV": {
+			"commandName": "Project",
+			"launchBrowser": true,
+			"launchUrl": "authuser",
+			"environmentVariables": {
+				"ASPNETCORE_ENVIRONMENT": "Development",
+				"ASPNETCORE_URLS": "https://localhost:5188"
+			},
+			"dotnetRunMessages": true,
+			"applicationUrl": "https://localhost:5188"
+		}
+	},
+	"$schema": "http://json.schemastore.org/launchsettings.json"
 }
