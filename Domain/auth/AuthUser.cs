@@ -12,33 +12,13 @@ public class AuthUser : IdentityUser
     public AuthUser(ApplicationUser ApplicationUser)
     {
         this.ApplicationUser = ApplicationUser;
-        this.UserName = $"{ApplicationUser.FirstName} {ApplicationUser.LastName}";
-        this.Email = ApplicationUser.Email;
+        this.UserName = $"{ApplicationUser?.FirstName} {ApplicationUser?.LastName}";
+        this.Email = ApplicationUser?.Email;
     }
 
     public AuthUser() { }
 
     public IList<ApplicationRole> Roles { get; set; }
-    //[NotMapped]
-    //[Newtonsoft.Json.JsonIgnore]
-    //public  string? AuthenticationType
-    //{
-    //    get => "authType";
-    //    set
-    //    {
-    //        AuthenticationType = "yes";
-    //    }
-    //}
-    //[NotMapped]
-    //[Newtonsoft.Json.JsonIgnore]
-    //public bool IsAuthenticated
-    //{
-    //    get => IsAuthenticated;
-    //    set
-    //    {
-    //        IsAuthenticated = false;
-    //    }
-    //}
 
     public bool HasRole(string roleName)
     {

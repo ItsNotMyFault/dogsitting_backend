@@ -24,6 +24,7 @@ namespace dogsitting_backend.Infrastructure.store
 
 
         public CustomUserStore(
+            IGenericRepository<ApplicationUser> userGenereicRepository,
             IGenericRepository<ApplicationRole> roleGenericRepository,
             IGenericRepository<UserLogin> UserLoginGenericRepository,
             UserSQLRepository userSQLRepository,
@@ -59,9 +60,13 @@ namespace dogsitting_backend.Infrastructure.store
             {
                 throw new ArgumentNullException(nameof(user), "Parameter user is not set to an instance of an object.");
             }
+            if (user.ApplicationUser == null)
+            {
+                throw new ArgumentNullException(nameof(user.ApplicationUser), "Parameter user.ApplicationUser is not set to an instance of an object.");
+            }
 
-            var test = this.userGenereicRepository.AddAsync(user.ApplicationUser);
-            return null;
+            this.userGenereicRepository.AddAsync(user.ApplicationUser);
+            return Task.FromResult(IdentityResult.Success);
         }
 
         public Task<IdentityResult> DeleteAsync(AuthUser user, CancellationToken cancellationToken)
@@ -243,8 +248,8 @@ namespace dogsitting_backend.Infrastructure.store
 
         public Task<AuthUser> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            // TODO...
-            throw new NotImplementedException();
+            var applicationuser = this.userSQLRepository.FindByEmail(normalizedEmail).Result;
+            return Task.FromResult<AuthUser>(new AuthUser(applicationuser));
         }
 
         public Task<string> GetNormalizedEmailAsync(AuthUser user, CancellationToken cancellationToken)
@@ -318,12 +323,30 @@ namespace dogsitting_backend.Infrastructure.store
         {
             throw new NotImplementedException();
         }
-
-        public Task AddLoginAsync(AuthUser user, UserLoginInfo login, CancellationToken cancellationToken)
+        public async Task AddLoginAsync(AuthUser user, UserLoginInfo login, CancellationToken cancellationToken)
         {
-            return userLoginGenericRepository.AddAsync(new UserLogin(login.LoginProvider, login.ProviderKey, login.ProviderDisplayName));
-        }
+            if (user == null)
+                throw new ArgumentNullException(nameof(user));
+            if (login == null)
+                throw new ArgumentNullException(nameof(login));
 
+            try
+            {
+                var newUserLogin = new UserLogin(
+                    login.LoginProvider,
+                    login.ProviderKey,
+                    user.ApplicationUser.Id,
+                    login.ProviderDisplayName
+                );
+
+                await this.userLoginGenericRepository.AddAsync(newUserLogin);
+            }
+            catch (Exception ex)
+            {
+                var e = ex;
+                // throw new ApplicationException("Failed to add user login", ex);
+            }
+        }
         public Task RemoveLoginAsync(AuthUser user, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
             UserLogin userLogin = userLoginGenericRepository.Build().FirstOrDefault(x => x.LoginProvider == loginProvider && x.ProviderKey == providerKey);
@@ -335,7 +358,7 @@ namespace dogsitting_backend.Infrastructure.store
             throw new NotImplementedException();
         }
 
-        public Task<AuthUser?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
+        public async Task<AuthUser?> FindByLoginAsync(string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(loginProvider))
             {
@@ -345,8 +368,16 @@ namespace dogsitting_backend.Infrastructure.store
             {
                 throw new ArgumentNullException(nameof(providerKey), "Parameter providerKey is not set");
             }
-            ApplicationUser user = this.userSQLRepository.FindByLoginProvider(loginProvider, providerKey).Result;
-            return Task.FromResult<AuthUser?>(new AuthUser(user));
+            ApplicationUser? user = null;
+            try
+            {
+                user = await this.userSQLRepository.FindByLoginProvider(loginProvider, providerKey);
+            }
+            catch (Exception e)
+            {
+                var tt = e;
+            }
+            return user != null ? new AuthUser(user) : null;
         }
 
         public Task SetPasswordHashAsync(ApplicationUser user, string? passwordHash, CancellationToken cancellationToken)

@@ -92,9 +92,19 @@ namespace dogsitting_backend.ApplicationServices
             else
             {
                 UserLoginInfo userLoginInfo = new(loginProvider, providerkey, providerDisplayName);
-                AuthUser appUser = await this._userManager.FindByEmailAsync(emailAddress);
+                AuthUser? appUser = null;
+                try
+                {
+                    appUser = await this._userManager.FindByEmailAsync(emailAddress);
+
+                }
+                catch (Exception e)
+                {
+                    var err = e;
+                }
                 if (appUser != null)
                 {
+
                     await this._userManager.AddLoginAsync(appUser, userLoginInfo);
                     await this._signInManager.SignInAsync(appUser, false);
                 }
@@ -104,6 +114,7 @@ namespace dogsitting_backend.ApplicationServices
                     await this._userManager.AddLoginAsync(createdUser, userLoginInfo);
                     await this._signInManager.SignInAsync(createdUser, false);
                 }
+
             }
 
             return true;
@@ -128,6 +139,10 @@ namespace dogsitting_backend.ApplicationServices
                     NormalizedEmail = emailAddress.ToUpper(),
                     UserName = $"{givenname}.{surname}",
                     NormalizedUserName = $"{givenname}.{surname}".ToUpper(),
+                    ApplicationUser = new Domain.ApplicationUser(givenname, surname)
+                    {
+                        Email = emailAddress,
+                    }
                 };
                 IdentityResult creationResult = this._userManager.CreateAsync(newUser).Result;
 

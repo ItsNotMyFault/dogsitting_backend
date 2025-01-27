@@ -30,14 +30,9 @@ namespace dogsitting_backend.Controllers
 
         public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService authService, UserManager<AuthUser> userManager)
         {
-            Console.WriteLine($"=========AuthenticationController=========");
             this.httpContextAccessor = httpContextAccessor;
             claimsPrincipal = httpContextAccessor.HttpContext.User;
-            Console.WriteLine(httpContextAccessor);
-            Console.WriteLine(httpContextAccessor.HttpContext.User);
-            _authUser = userManager.GetUserAsync(claimsPrincipal).Result;
-            Console.WriteLine("_authUser");
-            Console.WriteLine(_authUser);
+            this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
             _authService = authService;
 
         }
@@ -46,7 +41,7 @@ namespace dogsitting_backend.Controllers
         [AllowAnonymous]
         public IActionResult GetLoggedInUser()
         {
-            if (_authUser == null)
+            if (this._authUser == null)
             {
                 throw new Exception("not authentified");
             }
@@ -55,7 +50,7 @@ namespace dogsitting_backend.Controllers
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
 
-            string json = JsonConvert.SerializeObject(_authUser.ApplicationUser, settings);
+            string json = JsonConvert.SerializeObject(this._authUser.ApplicationUser, settings);
             return Ok(json);
         }
 
@@ -79,23 +74,15 @@ namespace dogsitting_backend.Controllers
             AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(FacebookDefaults.AuthenticationScheme);
 
             Console.WriteLine($"=========FacebookLoginCallback=========");
-            Console.WriteLine(authenticateResult.Ticket);
-            Console.WriteLine(authenticateResult.Succeeded);
-            Console.WriteLine(HttpContext.Session);
-            Console.WriteLine(authenticateResult.Principal);
             if (!authenticateResult.Succeeded)
             {
                 // Handle authentication failure
                 return RedirectToAction(nameof(Accessdenied));
             }
             ClaimsPrincipal claimsPrincipal = authenticateResult.Principal;
-            ClaimsIdentity claimsIdentity = claimsPrincipal.Identity as ClaimsIdentity;
-            string serializedAccessToken = HttpContext.Session.GetString("facebook_accesstoken");
-            string serializedTokenResponse = HttpContext.Session.GetString("facebook_tokenResponse");
-            Console.WriteLine("--------------------------");
-            Console.WriteLine(serializedAccessToken);
-            Console.WriteLine("--------------------------");
-            Console.WriteLine(serializedTokenResponse);
+            ClaimsIdentity? claimsIdentity = claimsPrincipal.Identity as ClaimsIdentity;
+            string? serializedAccessToken = HttpContext.Session.GetString("facebook_accesstoken");
+            string? serializedTokenResponse = HttpContext.Session.GetString("facebook_tokenResponse");
             OAuthTokenResponse tokenResponse = RetrieveTokenResponseFromString(serializedTokenResponse);
             await _authService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
 
@@ -105,22 +92,12 @@ namespace dogsitting_backend.Controllers
         private OAuthTokenResponse RetrieveTokenResponseFromString(string serializedAccessToken)
         {
             JsonDocument jsonDocument = JsonDocument.Parse(serializedAccessToken);
-            Console.WriteLine(jsonDocument);
             OAuthTokenResponse tokenResponse = OAuthTokenResponse.Success(jsonDocument);
-            Console.WriteLine(tokenResponse);
 
-            // Extract values from JsonDocument
-            string accessToken = jsonDocument.RootElement.GetProperty("AccessToken").GetString();
-            Console.WriteLine("BROOOOOOOOOOOOO");
-            Console.WriteLine(accessToken);
-            string tokenType = jsonDocument.RootElement.GetProperty("TokenType").GetString();
-            string refreshToken = jsonDocument.RootElement.GetProperty("RefreshToken").GetString();
-            string expiresIn = jsonDocument.RootElement.GetProperty("ExpiresIn").GetString();
-            tokenResponse.AccessToken = accessToken;
-            tokenResponse.TokenType = tokenType;
-            tokenResponse.ExpiresIn = expiresIn;
-            tokenResponse.RefreshToken = refreshToken;
-            Console.WriteLine(tokenResponse);
+            tokenResponse.AccessToken = jsonDocument.RootElement.GetProperty("AccessToken").GetString();
+            tokenResponse.TokenType = jsonDocument.RootElement.GetProperty("TokenType").GetString();
+            tokenResponse.RefreshToken = jsonDocument.RootElement.GetProperty("RefreshToken").GetString();
+            tokenResponse.ExpiresIn = jsonDocument.RootElement.GetProperty("ExpiresIn").GetString();
             return tokenResponse;
         }
 

@@ -66,19 +66,11 @@ namespace dogsitting_backend.Startup
                     {
                         Console.WriteLine($"=========OnCreatingTicket=========");
                         var accessToken = context.AccessToken; // Use direct access token
-                        Console.WriteLine("accessToken");
-                        Console.WriteLine(accessToken);
                         OAuthTokenResponse tokenResponse = context.TokenResponse;
-                        Console.WriteLine("tokenResponse");
-                        Console.WriteLine(tokenResponse);
 
                         context.HttpContext.Session.SetString("facebook_accesstoken", JsonConvert.SerializeObject(accessToken));
                         context.HttpContext.Session.SetString("facebook_tokenResponse", JsonConvert.SerializeObject(tokenResponse));
-                        Console.WriteLine($"=========facebook_accesstoken=========");
                         var getToken = context.HttpContext.Session.Get("facebook_accesstoken");
-                        Console.WriteLine("getToken");
-                        Console.WriteLine(getToken);
-
                         await Task.CompletedTask;
                     },
                     OnRedirectToAuthorizationEndpoint = async context =>

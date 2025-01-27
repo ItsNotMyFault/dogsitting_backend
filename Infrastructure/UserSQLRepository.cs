@@ -26,10 +26,14 @@ namespace dogsitting_backend.Infrastructure
             return await this.context.Users.ToListAsync();
         }
 
-        public async Task<ApplicationUser> FindByLoginProvider(string loginProvider, string providerKey)
+        public async Task<ApplicationUser?> FindByLoginProvider(string loginProvider, string providerKey)
         {
-            providerKey = "badkey";
-            return await this.context.Users.Include(x => x.UserLogins).Where(x => x.UserLogins.Any(x => x.LoginProvider == loginProvider && x.ProviderKey == providerKey)).FirstAsync();
+            return await this.context.Users.Include(x => x.UserLogins).Where(x => x.UserLogins.Any(x => x.LoginProvider == loginProvider && x.ProviderKey == providerKey)).FirstOrDefaultAsync();
+        }
+
+        public async Task<ApplicationUser> FindByEmail(string email)
+        {
+            return await this.context.Users.Where(x => x.Email == email).FirstAsync();
         }
 
         public async Task<ApplicationUser> FindById(Guid userId)

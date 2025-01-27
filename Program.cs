@@ -15,12 +15,8 @@ services.AddControllers();
 services.AddSignalR();
 
 var res = Debugger.Launch();
-Console.WriteLine($"=========DEBUGGER {res}=========");
-if (!res)
-{
-    Console.WriteLine($"=========DEBUGGER {res}=========");
-}
-Console.WriteLine($"=========WAIT OVER {Debugger.IsAttached}=========");
+
+Console.WriteLine($"=========Debugger attached? {Debugger.IsAttached} res => {res}=========");
 
 IConfigurationRoot Configuration = builder.Configuration;
 IWebHostEnvironment Environment = builder.Environment;
@@ -89,10 +85,11 @@ services.AddCors(options =>
 
 builder.Services.AddDbContext<DogsittingDBContext>(options =>
 {
+    Console.WriteLine($"=========AddDbContext=========");
     try
     {
-        string connetionString = builder.Configuration.GetSection("ConnectionString:Dev:dogsitting").Value;
-        options.UseMySql(connetionString, ServerVersion.AutoDetect(connetionString));
+        string connetionString = "Server=localhost;Port=3306;Database=dogsitting;User Id=root;Password=alexis;";
+        var optionsBuilder = options.UseMySql(connetionString, new MySqlServerVersion(new Version(8, 4, 4))).EnableDetailedErrors();
     }
     catch (Exception err)
     {

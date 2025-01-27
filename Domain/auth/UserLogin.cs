@@ -9,14 +9,18 @@ using System.Threading.Tasks;
 
 namespace dogsitting_backend.Domain.auth
 {
-    [PrimaryKey(nameof(ProviderKey), nameof(LoginProvider))]
+    [PrimaryKey(nameof(ProviderKey), nameof(LoginProvider), nameof(UserId))]
     public class UserLogin
     {
-        public UserLogin(string loginProvider, string providerKey, string? displayName)
+        public UserLogin(string loginProvider, string providerKey, Guid UserId, string? displayName)
         {
             this.LoginProvider = loginProvider;
             this.ProviderKey = providerKey;
-            this.ProviderDisplayName = displayName;
+            this.UserId = UserId;
+            if (!string.IsNullOrEmpty(displayName))
+            {
+                this.ProviderDisplayName = displayName;
+            }
         }
 
         public UserLogin() { }
@@ -28,6 +32,6 @@ namespace dogsitting_backend.Domain.auth
         public string ProviderDisplayName { get; set; }
         [ForeignKey("User")]
         public Guid UserId { get; set; }
-        public virtual ApplicationUser User{ get; set; }
+        public virtual ApplicationUser User { get; set; }
     }
 }
