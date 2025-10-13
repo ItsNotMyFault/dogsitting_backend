@@ -5,13 +5,13 @@ using System.Globalization;
 namespace dogsitting_backend.Domain.calendar
 {
     [NotMapped]
-    public class BusyCalendarEvent : CalendarEvent
+    public class ReservationEvent : CalendarEvent
     {
         public int LodgerCount { get; set; }
         public bool IsBusy { get; set; }
         public bool IsFree { get; set; }
         public bool IsFull { get; set; }
-        public BusyCalendarEvent(Reservation reservation, DateTime dateTime, bool isBusy = false) : base(dateTime)
+        public ReservationEvent(Reservation reservation, DateTimePeriod dateTime, bool isBusy = false) : base(dateTime)
         {
             Id = reservation.Id;
             LodgerCount = reservation.LodgerCount;
@@ -19,7 +19,7 @@ namespace dogsitting_backend.Domain.calendar
             IsBusy = isBusy;
         }
 
-        public BusyCalendarEvent(Availability availability) : base(availability.DateFrom)
+        public ReservationEvent(Availability availability) : base(availability.DateFrom)
         {
             this.DateTimePeriod = availability.Period;
             if (availability.IsAvailable)

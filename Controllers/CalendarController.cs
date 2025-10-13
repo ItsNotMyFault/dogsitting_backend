@@ -51,7 +51,7 @@ namespace dogsitting_backend.Controllers
         [Route("team/{team}/busyevents")]
         public async Task<ActionResult> GetBusyEvents([FromRoute] string team)
         {
-            List<BusyCalendarEvent> events = await this.calendarService.GetCalendarBusyEvents(team);
+            List<ReservationEvent> events = await this.calendarService.GetCalendarBusyEvents(team);
             var settings = new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore

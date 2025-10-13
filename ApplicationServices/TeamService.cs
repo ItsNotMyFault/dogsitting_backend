@@ -79,13 +79,13 @@ namespace dogsitting_backend.ApplicationServices
             Team newTeam = new(team);
             AuthUser user = this._userService.GetCurrentUserAsync().Result;
 
-            Team foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
+            Team? foundTeam = this._teamSQLRepository.GetTeamByUser(user.ApplicationUser);
             if (foundTeam != null)
             {
                 throw new Exception("This user already has a team assigned to it.");
             }
 
-            foundTeam = this._teamSQLRepository.GetTeamByNormalizedName(newTeam.NormalizedName).Result;
+            foundTeam = await this._teamSQLRepository.GetTeamByNormalizedName(newTeam.NormalizedName);
 
             if (foundTeam != null)
             {

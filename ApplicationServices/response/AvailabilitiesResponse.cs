@@ -8,7 +8,7 @@ namespace dogsitting_backend.Domain
     {
 
         // Define backing fields for DateFrom and DateTo
-        public required List<BusyCalendarEvent> BusyEvents { get; set; }
+        public required List<ReservationEvent> BusyEvents { get; set; }
         public required List<AvailableCalendarEvent> AvailableEvents { get; set; }
 
 

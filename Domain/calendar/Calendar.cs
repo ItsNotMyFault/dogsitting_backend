@@ -57,7 +57,8 @@ namespace dogsitting_backend.Domain.calendar
             foreach (DateTime datetime in GeneralPeriod.EachDay())
             {
                 events.Add(new CalendarEvent(datetime));
-            };
+            }
+            ;
             return events;
         }
 
@@ -88,9 +89,9 @@ namespace dogsitting_backend.Domain.calendar
 
 
 
-        public List<BusyCalendarEvent> GetComputedBusyEvents()
+        public List<ReservationEvent> GetComputedBusyEvents()
         {
-            List<BusyCalendarEvent> BusyEvents = [];
+            List<ReservationEvent> BusyEvents = [];
 
             this.Reservations.ToList().ForEach(reservation =>
             {
@@ -108,12 +109,12 @@ namespace dogsitting_backend.Domain.calendar
                     if (!busyDayAlreadyExists)
                     {
                         //adds a new date as "busy"
-                        BusyEvents.Add(new BusyCalendarEvent(reservation, ev.DateTimePeriod.StartDate));
+                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod.StartDate));
                     }
                     else
                     {
                         //add coresponding amount of lodger to existing
-                        BusyCalendarEvent busyEvent = BusyEvents.Where(busyEvent => busyEvent.DateTimePeriod.StartDate == ev.DateTimePeriod.StartDate).First();
+                        ReservationEvent busyEvent = BusyEvents.Where(busyEvent => busyEvent.DateTimePeriod.StartDate == ev.DateTimePeriod.StartDate).First();
                         busyEvent.AddLodger(reservation.LodgerCount);
                     }
                 });
@@ -129,7 +130,7 @@ namespace dogsitting_backend.Domain.calendar
                 });
                 if (!busyDayAlreadyExists)
                 {
-                    BusyEvents.Add(new BusyCalendarEvent(availability));
+                    BusyEvents.Add(new ReservationEvent(availability));
                 }
             });
 
@@ -175,10 +176,10 @@ namespace dogsitting_backend.Domain.calendar
             return AvailableEvents;
         }
 
-        public List<BusyCalendarEvent> GetBusyEvents()
+        public List<ReservationEvent> GetBusyEvents()
         {
 
-            List<BusyCalendarEvent> BusyEvents = [];
+            List<ReservationEvent> BusyEvents = [];
             this.Reservations.ToList().ForEach(reservation =>
             {
                 reservation.GetDailyEvents().ForEach(ev =>
@@ -190,7 +191,7 @@ namespace dogsitting_backend.Domain.calendar
                     if (!busyDayAlreadyExists)
                     {
                         //adds a new date as "busy"
-                        BusyEvents.Add(new BusyCalendarEvent(reservation, ev.DateTimePeriod.StartDate, true));
+                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod.StartDate, true));
                     }
                 });
             });

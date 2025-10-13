@@ -65,13 +65,14 @@ namespace dogsitting_backend.Domain
             foreach (DateTime datetime in dates)
             {
                 events.Add(new CalendarEvent(datetime));
-            };
+            }
+            ;
             return events;
         }
 
         public CalendarEvent GetReservationEvent()
         {
-            return new ReservationCalendarEvent(this.Id, this.Period.ToLocalTimezone(), this.ReservationCalendarTitle);
+            return null;
         }
 
         public override string ToString()

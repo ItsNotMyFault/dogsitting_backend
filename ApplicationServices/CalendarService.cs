@@ -56,7 +56,7 @@ namespace dogsitting_backend.ApplicationServices
             return calendar.GetReservationsEvents();
         }
 
-        public async Task<List<BusyCalendarEvent>> GetCalendarBusyEvents(string team)
+        public async Task<List<ReservationEvent>> GetCalendarBusyEvents(string team)
         {
             Calendar calendar = await this.GetTeamCalendar(team);
             if (calendar == null)
@@ -64,7 +64,7 @@ namespace dogsitting_backend.ApplicationServices
                 throw new Exception($"Calendar not found for team: {team}");
             }
             calendar.Availabilities = await this.GetCalendarAvailabilities(calendar.Id);
-            List<BusyCalendarEvent> events = calendar.GetComputedBusyEvents();
+            List<ReservationEvent> events = calendar.GetComputedBusyEvents();
             return events;
         }
 
@@ -76,7 +76,7 @@ namespace dogsitting_backend.ApplicationServices
                 throw new Exception($"Calendar not found for team: {team}");
             }
             calendar.Availabilities = await this.GetCalendarAvailabilities(calendar.Id);
-            List<BusyCalendarEvent> busyEvents = calendar.GetBusyEvents();
+            List<ReservationEvent> busyEvents = calendar.GetBusyEvents();
             List<AvailableCalendarEvent> availableEvents = calendar.GetAvailableEvents();
             return new AvailabilitiesResponse() { AvailableEvents = availableEvents, BusyEvents = busyEvents };
         }

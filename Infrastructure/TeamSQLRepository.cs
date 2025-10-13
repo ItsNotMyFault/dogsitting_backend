@@ -35,9 +35,9 @@ namespace dogsitting_backend.Infrastructure
             return await this.Context.Teams.Include(team => team.Admins).Include(team => team.Calendar).FirstAsync(t => t.Id == id);
         }
 
-        public Task<Team> GetTeamByNormalizedName(string teamName)
+        public Task<Team?> GetTeamByNormalizedName(string teamName)
         {
-            return this.Context.Teams.FirstAsync(team => team.NormalizedName == teamName);
+            return this.Context.Teams.FirstOrDefaultAsync(team => team.NormalizedName == teamName);
         }
 
         public Task<List<Team>> GetUserTeams(Guid userId)
