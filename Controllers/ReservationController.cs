@@ -76,7 +76,7 @@ namespace dogsitting_backend.Controllers
 
 
         // [HttpPost("{team}", Name = "CreateReservation")]
-        [HttpPost("teams/{team}/reservations", Name = "CreateReservation")]
+        [HttpPost("team/{team}/reservations", Name = "CreateReservation")]
         public async Task<ActionResult> CreateReservation([FromBody] ReservationDto reservation, string team)
         {
             ReservationResponse newReservation = await this.ReservationService.AddReservationToTeamCalendar(reservation, team);

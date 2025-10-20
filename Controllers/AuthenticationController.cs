@@ -27,14 +27,17 @@ namespace dogsitting_backend.Controllers
         private AuthService _authService;
         private AuthUser _authUser;
         private IHttpContextAccessor httpContextAccessor;
+        private IConfiguration _configuration;
+        private string frontendUrl = "http://localhost:4000";
 
-        public AuthenticationController(IHttpContextAccessor httpContextAccessor, AuthService authService, UserManager<AuthUser> userManager)
+        public AuthenticationController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, AuthService authService, UserManager<AuthUser> userManager)
         {
             this.httpContextAccessor = httpContextAccessor;
             claimsPrincipal = httpContextAccessor.HttpContext.User;
             this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
             _authService = authService;
-
+            _configuration = configuration;
+            this.frontendUrl = _configuration.GetValue<string>("FrontendUrl");
         }
 
         [HttpGet("authuser")]
@@ -105,14 +108,14 @@ namespace dogsitting_backend.Controllers
         [HttpGet("accessdenied")]
         public void Accessdenied()
         {
-            HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
+            HttpContext.Response.Redirect($"{this.frontendUrl}/accessdenied");
         }
 
         [AllowAnonymous]
         [HttpGet("home")]
         public void Home()
         {
-            HttpContext.Response.Redirect("https://localhost:4000/");
+            HttpContext.Response.Redirect($"{this.frontendUrl}/HomeView");
         }
 
 
@@ -149,7 +152,7 @@ namespace dogsitting_backend.Controllers
         {
             await _authService.Signout();
 
-            HttpContext.Response.Redirect("https://localhost:4000/home");
+            HttpContext.Response.Redirect($"{this.frontendUrl}/home");
             return Ok("success");
         }
 

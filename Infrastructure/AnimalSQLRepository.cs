@@ -20,7 +20,7 @@ namespace dogsitting_backend.Infrastructure
 
         public async Task<List<Animal>> GetAnimalsAsync()
         {
-            return await this.Context.Animals.ToListAsync();
+            return await this.Context.Animals.Include(a => a.Media).ToListAsync();
         }
 
 

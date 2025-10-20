@@ -109,7 +109,7 @@ namespace dogsitting_backend.Domain.calendar
                     if (!busyDayAlreadyExists)
                     {
                         //adds a new date as "busy"
-                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod.StartDate));
+                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod));
                     }
                     else
                     {
@@ -191,7 +191,7 @@ namespace dogsitting_backend.Domain.calendar
                     if (!busyDayAlreadyExists)
                     {
                         //adds a new date as "busy"
-                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod.StartDate, true));
+                        BusyEvents.Add(new ReservationEvent(reservation, ev.DateTimePeriod, true));
                     }
                 });
             });

@@ -77,6 +77,7 @@ services.AddCors(options =>
         builder =>
         {
             builder.WithOrigins("https://localhost:4000")
+                    .WithOrigins("http://localhost:4000")
                    .AllowAnyHeader()
                    .AllowAnyMethod()
                    .AllowCredentials(); // Allow credentials if cookies or other credentials are needed
@@ -88,8 +89,8 @@ builder.Services.AddDbContext<DogsittingDBContext>(options =>
     Console.WriteLine($"=========AddDbContext=========");
     try
     {
-        string connetionString = "Server=localhost;Port=3306;Database=dogsitting;User Id=root;Password=alexis;";
-        var optionsBuilder = options.UseMySql(connetionString, new MySqlServerVersion(new Version(8, 4, 4))).EnableDetailedErrors();
+        var connectionString = Configuration.GetConnectionString("dogsitting");
+        var optionsBuilder = options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 4, 4))).EnableDetailedErrors();
     }
     catch (Exception err)
     {
