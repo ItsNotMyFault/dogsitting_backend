@@ -86,7 +86,6 @@ services.AddCors(options =>
 
 builder.Services.AddDbContext<DogsittingDBContext>(options =>
 {
-    Console.WriteLine($"=========AddDbContext=========");
     try
     {
         var connectionString = Configuration.GetConnectionString("dogsitting");

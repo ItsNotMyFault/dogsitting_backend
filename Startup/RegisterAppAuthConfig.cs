@@ -73,6 +73,11 @@ namespace dogsitting_backend.Startup
                         var getToken = context.HttpContext.Session.Get("facebook_accesstoken");
                         await Task.CompletedTask;
                     },
+                    OnTicketReceived = async context =>
+                    {
+                        Console.WriteLine($"=========OnTicketReceived=========");
+                        await Task.CompletedTask;
+                    },
                     OnRedirectToAuthorizationEndpoint = async context =>
                     {
                         Console.WriteLine($"=========OnRedirectToAuthorizationEndpoint=========");
@@ -84,11 +89,6 @@ namespace dogsitting_backend.Startup
                         Console.WriteLine($"=========OnRemoteFailure=========");
                         var errorMessage = context.Failure.Message;
                         context.HttpContext.Response.Redirect("https://localhost:4000/accessdenied");
-                        await Task.CompletedTask;
-                    },
-                    OnTicketReceived = async context =>
-                    {
-                        Console.WriteLine($"=========OnTicketReceived=========");
                         await Task.CompletedTask;
                     },
                 };

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using NuGet.Protocol;
 using System.Text.Json;
 using Humanizer;
+using System.Threading.Tasks;
 
 
 
@@ -23,27 +24,28 @@ namespace dogsitting_backend.Controllers
     [AllowAnonymous]
     public class AuthenticationController : ControllerBase
     {
-        private readonly ClaimsPrincipal claimsPrincipal;
         private AuthService _authService;
         private AuthUser _authUser;
         private IHttpContextAccessor httpContextAccessor;
         private IConfiguration _configuration;
+        private UserManager<AuthUser> _userManager;
         private string frontendUrl = "http://localhost:4000";
 
         public AuthenticationController(IHttpContextAccessor httpContextAccessor, IConfiguration configuration, AuthService authService, UserManager<AuthUser> userManager)
         {
             this.httpContextAccessor = httpContextAccessor;
-            claimsPrincipal = httpContextAccessor.HttpContext.User;
-            this._authUser = userManager.GetUserAsync(claimsPrincipal).Result;
             _authService = authService;
             _configuration = configuration;
             this.frontendUrl = _configuration.GetValue<string>("FrontendUrl");
+            this._userManager = userManager;
         }
 
         [HttpGet("authuser")]
         [AllowAnonymous]
-        public IActionResult GetLoggedInUser()
+        public async Task<IActionResult> GetLoggedInUser()
         {
+            ClaimsPrincipal claimsPrincipal = httpContextAccessor.HttpContext.User;
+            this._authUser = await _userManager.GetUserAsync(claimsPrincipal);
             if (this._authUser == null)
             {
                 throw new Exception("not authentified");
@@ -89,7 +91,23 @@ namespace dogsitting_backend.Controllers
             OAuthTokenResponse tokenResponse = RetrieveTokenResponseFromString(serializedTokenResponse);
             await _authService.AuthenticateWithExternalProvider(claimsIdentity, tokenResponse);
 
-            return RedirectToAction(nameof(Home));
+
+            Response.Cookies.Append("ds_auth_token", serializedAccessToken, new CookieOptions
+            {
+                HttpOnly = true, // important!
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Domain = "localhost"
+            });
+
+            return RedirectToAction(nameof(FacebookSuccess));
+        }
+
+        [AllowAnonymous]
+        [HttpGet("home")]
+        public void FacebookSuccess()
+        {
+            HttpContext.Response.Redirect($"{this.frontendUrl}/api/auth/facebook-success");
         }
 
         private OAuthTokenResponse RetrieveTokenResponseFromString(string serializedAccessToken)
@@ -111,12 +129,6 @@ namespace dogsitting_backend.Controllers
             HttpContext.Response.Redirect($"{this.frontendUrl}/accessdenied");
         }
 
-        [AllowAnonymous]
-        [HttpGet("home")]
-        public void Home()
-        {
-            HttpContext.Response.Redirect($"{this.frontendUrl}/HomeView");
-        }
 
 
         [HttpPost]
